@@ -1,0 +1,260 @@
+.container-fluid {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.row {
+    height: 100vh;
+    margin: 0;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 !important;
+    /* Quitar padding de Bootstrap */
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: var(--sidebar-bg);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--sidebar-hover);
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    height: 100%;
+    padding: 0;
+}
+
+.sidebar-header {
+    padding: 1.5rem 1.25rem;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(135deg, var(--accent-color) 0%, #8b5cf6 100%);
+    flex-shrink: 0;
+    /* Evita que se encoja */
+}
+
+.sidebar-header h5 {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Navegación - Estilo compacto pero con espaciado */
+.sidebar-nav {
+    flex: 1 1 auto;
+    padding: 0.75rem 0;
+    margin: 0;
+    width: 100%;
+}
+
+.sidebar-nav .nav-item {
+    margin: 0.25rem 0.75rem;
+    width: calc(100% - 1.5rem);
+}
+
+.sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.7rem 1rem;
+    color: var(--text-secondary);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    text-decoration: none;
+    line-height: 1.3;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    border-left: 3px solid transparent;
+}
+
+/* EFECTO HOVER - Color morado oscuro al pasar el mouse */
+.sidebar-nav .nav-link:hover {
+    background: #8e4ff3;
+    /* Morado oscuro */
+    color: white;
+    /* Texto blanco para contraste */
+    transform: translateX(3px);
+    border-left-color: #b5a0e6;
+    /* Morado más claro para el borde */
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+    /* Sombra morada */
+}
+
+/* ESTADO ACTIVO - Se mantiene morado cuando estamos en ese apartado */
+.sidebar-nav .nav-link.active {
+    background: #6d28d9;
+    /* Mismo morado oscuro */
+    color: white;
+    /* Texto blanco */
+    border-left-color: #8b5cf6;
+    /* Borde morado claro */
+    box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+    /* Sombra morada */
+    transform: translateX(0);
+}
+
+/* También puedes agregar un efecto para el foco (accesibilidad) */
+.sidebar-nav .nav-link:focus-visible {
+    outline: 2px solid #8b5cf6;
+    outline-offset: 2px;
+}
+
+.sidebar-nav .nav-link i {
+    width: 22px;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+.sidebar-nav .nav-link span {
+    flex: 1;
+}
+
+/* Opcional: Si quieres que el color del icono también cambie */
+.sidebar-nav .nav-link:hover i,
+.sidebar-nav .nav-link.active i {
+    color: white;
+    /* Iconos blancos en hover y activo */
+}
+
+/* Sidebar footer - siempre al final */
+.sidebar-footer {
+    padding: 1.25rem 1.25rem;
+    /* Aumentado padding superior */
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+    /* Empuja el footer hacia abajo */
+    flex-shrink: 0;
+    /* Evita que se encoja */
+    background: var(--sidebar-bg);
+    /* Mismo fondo para continuidad */
+}
+
+.btn-logout {
+    padding: 0.7rem 1rem;
+    /* Aumentado para igualar nav-links */
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    /* Igual que nav-links */
+    font-weight: 500;
+    font-size: 0.95rem;
+    /* Igual que nav-links */
+    transition: all 0.2s ease;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+.btn-logout i {
+    width: 22px;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    text-align: center;
+}
+
+/* Hover del logout similar a nav-links */
+.btn-logout:hover {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #dc2626;
+    transform: translateX(3px);
+    /* Mismo efecto que nav-links */
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    /* Aumentado */
+    gap: 0.75rem;
+    /* Aumentado */
+    padding: 1rem 0 0 0;
+    /* Aumentado padding superior */
+    border-top: 1px solid var(--border-color);
+    /* Restaurado borde visible */
+}
+
+.user-info i {
+    font-size: 1.3rem;
+    /* Aumentado */
+    width: 26px;
+    text-align: center;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 16.666667%;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--main-bg);
+    overflow-x: hidden;
+    padding: 0 !important;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .main-content {
+        margin-left: 0;
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 280px !important;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+}
+
+/* Mejoras de scroll */
+.main-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

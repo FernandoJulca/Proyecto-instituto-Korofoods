@@ -1,0 +1,597 @@
+.menu-container {
+  min-height: 100vh;
+  background-color: #faf8f5;
+}
+
+/* Hero Section */
+.menu-hero {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url('/img/banner3.jpg') center/cover;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 2rem;
+}
+
+.hero-content {
+  max-width: 1200px;
+  text-align: center;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.2;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 1200px;
+  font-family: Georgia, "Times New Roman", serif;
+  margin: 0 auto;
+}
+
+/* Download Section */
+.download-section {
+  padding: 4rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.download-card {
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 10px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.download-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.08), 0 16px 24px rgba(0, 0, 0, 0.08);
+}
+
+.download-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ffeee0 0%, #ffe0cc 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff8c42;
+  flex-shrink: 0;
+}
+
+.download-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.download-content {
+  flex: 1;
+}
+
+.download-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ff8c42;
+  margin-bottom: 0.5rem;
+}
+
+.download-description {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+.download-button {
+  background: #ff8c42;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 1rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.download-button:hover:not(:disabled) {
+  background: #e67935;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 140, 66, 0.3);
+}
+
+.download-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.download-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.download-button.downloading {
+  background: #999;
+}
+
+.download-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Filters Section */
+.filters-section {
+  padding: 2rem;
+  background: white;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.filters-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-button {
+  padding: 0.75rem 2rem;
+  border: 2px solid #ff8c42;
+  background: white;
+  color: #ff8c42;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.filter-button:hover {
+  background: #fff5ed;
+  transform: translateY(-2px);
+}
+
+.filter-button.active {
+  background: #ff8c42;
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+}
+
+/* Featured Section */
+.featured-section {
+  position: relative; /* CLAVE */
+  background-image: url("/img/banner1.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.opciones-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.featured-section .contenido {
+  position: relative;
+  z-index: 2; 
+}
+
+.featured-header {
+  text-align: center;
+  padding-top: 2rem;
+}
+
+.featured-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.featured-description {
+  font-size: 1.1rem;
+  color: white;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Loading State */
+.loading-container {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #ff8c42;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tipo Section */
+.platos-container {
+
+  padding: 1rem;
+}
+
+.tipo-section {
+  margin-bottom: 4rem;
+}
+
+.tipo-header {
+  text-align: center;
+  background-color: white;
+  border-radius: 1rem;
+  margin: 2rem 0rem;
+}
+
+.tipo-title {
+  font-size: 2rem;
+  font-weight: 700;
+  padding-top: .5rem;
+  color: #ff8c42;
+  display: inline-block;
+  position: relative;
+}
+
+.tipo-divider {
+  width: 80px;
+  height: 3px;
+  margin: 0 auto;
+}
+
+/* Swiper Container */
+.swiper-container-wrapper {
+  position: relative;
+  padding: 1rem 0 3rem;
+}
+
+/* Plato Card */
+.plato-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.plato-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.plato-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 75%;
+  overflow: hidden;
+}
+
+.plato-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.plato-card:hover .plato-image {
+  transform: scale(1.1);
+}
+
+.plato-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.7) 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.etiquetas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-self: flex-start;
+}
+
+.etiqueta-badge {
+  background-color: #F4EDE4;
+  color: #2c3e50;
+  padding: 0.35rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.plato-type-badge {
+  background: rgba(255, 140, 66, 0.95);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  align-self: flex-end;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.plato-info {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.plato-nombre {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.plato-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.plato-tipo {
+  font-size: 0.9rem;
+  color: #999;
+  font-weight: 500;
+}
+
+.plato-precio {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ff8c42;
+}
+
+/* Swiper Navigation */
+.swiper-button-prev,
+.swiper-button-next {
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.swiper-button-prev:after,
+.swiper-button-next:after {
+  font-size: 20px;
+  color: #ff8c42;
+  font-weight: 900;
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+  background: #ff8c42;
+  transform: scale(1.1);
+}
+
+.swiper-button-prev:hover:after,
+.swiper-button-next:hover:after {
+  color: white;
+}
+
+/* Swiper Pagination */
+.swiper-pagination {
+  bottom: 0 !important;
+}
+
+.swiper-pagination-bullet {
+  width: 12px;
+  height: 12px;
+  background: #ddd;
+  opacity: 1;
+  transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+  background: #ff8c42;
+  width: 30px;
+  border-radius: 6px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #999;
+}
+
+.empty-state svg {
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  background: #ff8c42;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.4);
+  transition: all 0.3s ease;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1000;
+}
+
+.scroll-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scroll-to-top:hover {
+  background: #e67935;
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(255, 140, 66, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  .download-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .download-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .download-title {
+    font-size: 1.5rem;
+  }
+
+  .download-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filters-container {
+    gap: 0.5rem;
+  }
+
+  .filter-button {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .featured-title {
+    font-size: 2rem;
+  }
+
+  .tipo-title {
+    font-size: 1.6rem;
+  }
+
+  .plato-nombre {
+    font-size: 1.1rem;
+  }
+
+  .plato-precio {
+    font-size: 1.3rem;
+  }
+
+  .swiper-button-prev,
+  .swiper-button-next {
+    width: 40px;
+    height: 40px;
+  }
+
+  .swiper-button-prev:after,
+  .swiper-button-next:after {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-hero {
+    min-height: 300px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .download-section {
+    padding: 2rem 1rem;
+  }
+
+  .download-card {
+    padding: 1.5rem;
+  }
+
+  .featured-section {
+    padding: 1rem;
+  }
+
+  .featured-title {
+    font-size: 1.75rem;
+  }
+
+  .filter-button {
+    font-size: 0.85rem;
+    padding: 0.5rem 1.2rem;
+  }
+
+  .scroll-to-top {
+    width: 45px;
+    height: 45px;
+    bottom: 1rem;
+    right: 1rem;
+  }
+}

@@ -1,0 +1,81 @@
+<div class="lista-pedidos-container">
+  <div class="header">
+    <h1>📋 Mis Pedidos</h1>
+    <button
+      class="btn-refrescar"
+      (click)="cargarPedidos()"
+      [disabled]="loading"
+    >
+      🔄 Refrescar
+    </button>
+  </div>
+
+  <!-- Error -->
+  <div class="error-message" *ngIf="error">
+    <span>⚠️ {{ error }}</span>
+    <button (click)="error = null">✖</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando pedidos...</p>
+  </div>
+
+  <!-- Lista de pedidos -->
+  <div class="pedidos-grid" *ngIf="!loading">
+    <div *ngFor="let pedido of pedidos" class="pedido-card">
+      <div class="pedido-header">
+        <h2>Pedido #{{ pedido.idPedido }}</h2>
+        <span
+          class="estado-badge"
+          [ngClass]="getEstadoBadgeClass(pedido.estado)"
+        >
+          {{ getEstadoTexto(pedido.estado) }}
+        </span>
+      </div>
+
+      <div class="pedido-info">
+        <div class="info-row">
+          <span class="label"
+            ><i class="fa-solid fa-chair" style="color: rgba(230, 126, 34, 1)">
+            </i>
+            Mesa:</span
+          >
+          <span class="value">{{ pedido.idMesa }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label"
+            ><i
+              class="fa-regular fa-calendar-days"
+              style="color: rgba(116, 192, 252, 1)"
+            ></i>
+            Fecha:</span
+          >
+          <span class="value">{{
+            pedido.fechaHora | date: "dd/MM/yyyy HH:mm"
+          }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label"
+            ><i class="fa-regular fa-money-bill-1"></i> Total:</span
+          >
+          <span class="value total"
+            >S/ {{ pedido.total | number: "1.2-2" }}</span
+          >
+        </div>
+      </div>
+
+      <button class="btn-ver-detalle" (click)="verDetalle(pedido.idPedido)">
+        Ver Detalles <i class="fa-solid fa-arrow-right-long"></i>
+      </button>
+    </div>
+
+    <!-- Sin pedidos -->
+    <div *ngIf="pedidos.length === 0" class="no-pedidos">
+      <div class="no-pedidos-icon">📋</div>
+      <h3>No tienes pedidos</h3>
+      <p>Aún no has realizado ningún pedido</p>
+    </div>
+  </div>
+</div>

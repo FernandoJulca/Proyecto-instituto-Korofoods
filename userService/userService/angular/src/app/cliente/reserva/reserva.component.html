@@ -1,0 +1,778 @@
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Reservar Mesa</h1>
+    <p class="hero-subtitle">
+      Reserva tu mesa para disfrutar de nuestra exquisita cocina asiática en un
+      ambiente acogedor
+    </p>
+    <div class="confirmation-badge">
+      <span class="check-icon">✓</span>
+      <span>Confirmación instantánea</span>
+    </div>
+  </div>
+</section>
+
+<section class="reservation-section">
+  <div class="container">
+    <!-- Stepper -->
+    <div class="stepper">
+      <div
+        class="step"
+        [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1"
+      >
+        <div class="step-number">1</div>
+        <div class="step-label">Personas</div>
+        <div class="step-line"></div>
+      </div>
+      <div
+        class="step"
+        [class.active]="currentStep === 2"
+        [class.completed]="currentStep > 2"
+      >
+        <div class="step-number">2</div>
+        <div class="step-label">Mesa</div>
+        <div class="step-line"></div>
+      </div>
+      <div
+        class="step"
+        [class.active]="currentStep === 3"
+        [class.completed]="currentStep > 3"
+      >
+        <div class="step-number">3</div>
+        <div class="step-label">Fecha</div>
+        <div class="step-line"></div>
+      </div>
+      <div
+        class="step"
+        [class.active]="currentStep === 4"
+        [class.completed]="currentStep > 4"
+      >
+        <div class="step-number">4</div>
+        <div class="step-label">Hora</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="currentStep === 5">
+        <div class="step-number">5</div>
+        <div class="step-label">Resumen</div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- Formulario Principal -->
+      <div class="form-card">
+        <!-- PASO 1: Personas -->
+        <div *ngIf="currentStep === 1" class="step-content">
+          <h2 class="step-title">¿Para cuántas personas?</h2>
+
+          <div class="counter-wrapper">
+            <button class="counter-btn" (click)="decrementPersonas()">−</button>
+            <div class="counter-display">
+              <span class="counter-value">{{ personas }}</span>
+              <span class="counter-label">personas</span>
+            </div>
+            <button class="counter-btn" (click)="incrementPersonas()">+</button>
+          </div>
+
+          <div class="quick-select">
+            <button
+              *ngFor="let num of quickNumbers"
+              class="quick-btn"
+              [class.active]="personas === num"
+              (click)="setPersonas(num)"
+            >
+              {{ num }}
+            </button>
+          </div>
+
+          <button class="btn-continue" (click)="nextStep()">Continuar</button>
+        </div>
+
+        <!-- PASO 2: Mesa -->
+        <div *ngIf="currentStep === 2" class="step-content">
+          <h2 class="step-title">Selecciona tu mesa</h2>
+
+          <!-- Selector de Zona -->
+          <div class="zona-selector">
+            <button
+              *ngFor="let zona of zonas"
+              class="zona-btn"
+              [class.active]="zonaSeleccionada === zona"
+              (click)="seleccionarZona(zona)"
+            >
+              Zona {{ zona }}
+            </button>
+          </div>
+
+          <!-- Componente de Mesas -->
+          <app-mesa-selector
+            [mesas]="mesasDisponibles"
+            [isLoading]="cargandoMesas"
+            [tipoVista]="'normal'"
+            [mensaje]="mensajeMesas"
+            (mesaSeleccionada)="onMesaSeleccionada($event)"
+          ></app-mesa-selector>
+
+          <div class="action-buttons">
+            <button class="btn-back" (click)="previousStep()">Atrás</button>
+            <button
+              class="btn-continue"
+              [disabled]="!mesaSeleccionada"
+              (click)="nextStep()"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 3: Fecha -->
+        <div *ngIf="currentStep === 3" class="step-content">
+          <h2 class="step-title">Selecciona la fecha</h2>
+
+          <div class="calendar">
+            <div class="calendar-header">
+              <button class="calendar-nav" (click)="previousMonth()">‹</button>
+              <span class="calendar-month">{{ getMonthYear() }}</span>
+              <button class="calendar-nav" (click)="nextMonth()">›</button>
+            </div>
+
+            <div class="calendar-weekdays">
+              <div *ngFor="let day of weekDays" class="weekday">{{ day }}</div>
+            </div>
+
+            <div class="calendar-days">
+              <div
+                *ngFor="let day of calendarDays"
+                class="calendar-day"
+                [class.disabled]="!day.enabled"
+                [class.selected]="day.selected"
+                [class.other-month]="day.otherMonth"
+                (click)="selectDate(day)"
+              >
+                {{ day.day }}
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-back" (click)="previousStep()">Atrás</button>
+            <button
+              class="btn-continue"
+              [disabled]="!selectedDate"
+              (click)="nextStep()"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 4: Hora -->
+        <div *ngIf="currentStep === 4" class="step-content">
+          <h2 class="step-title">Selecciona la hora</h2>
+
+          <div class="time-grid">
+            <button
+              *ngFor="let time of availableTimes"
+              class="time-btn"
+              [class.selected]="selectedTime === time"
+              [class.unavailable]="time.unavailable"
+              (click)="selectTime(time)"
+            >
+              {{ time.time }}
+            </button>
+          </div>
+
+          <div class="alternative-times" *ngIf="alternativeTimes.length > 0">
+            <p class="alternative-label">Horarios alternativos disponibles:</p>
+            <div class="alternative-grid">
+              <button
+                *ngFor="let time of alternativeTimes"
+                class="alternative-btn"
+                (click)="selectTime(time)"
+              >
+                {{ time.time }}
+              </button>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-back" (click)="previousStep()">Atrás</button>
+            <button
+              class="btn-continue"
+              [disabled]="!selectedTime"
+              (click)="nextStep()"
+            >
+              Continuar
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 5: Confirmar -->
+        <div *ngIf="currentStep === 5" class="step-content">
+          <h2 class="step-title">Confirmar reserva</h2>
+
+          <div class="auth-prompt" *ngIf="!usuarioAutenticado">
+            <div class="auth-icon">👤</div>
+            <h3>Inicia sesión para continuar</h3>
+            <p>Necesitas una cuenta para completar tu reserva</p>
+            <div class="auth-buttons">
+              <button class="btn-primary" (click)="irALogin()">
+                Iniciar Sesión
+              </button>
+              <button class="btn-secondary" (click)="irARegistro()">
+                Registrarse
+              </button>
+            </div>
+          </div>
+
+          <!-- Información de depósito y métodos de pago -->
+          <div class="deposit-info" *ngIf="usuarioAutenticado">
+            <h3 class="deposit-title">Depósito requerido</h3>
+            <div class="deposit-detail">
+              <span>Depósito (deducible de la cuenta final)</span>
+              <span class="deposit-amount">S/ 15.00</span>
+            </div>
+
+            <!-- SELECCIÓN DE MÉTODO DE PAGO -->
+            <p class="payment-label">Métodos de pago</p>
+            <div class="payment-methods">
+              <button
+                class="payment-btn"
+                [class.active]="metodoPagoSeleccionado === 'TARJETA'"
+                (click)="seleccionarMetodoPago('TARJETA')"
+              >
+                <span class="payment-icon">💳</span>
+                <span>Tarjeta</span>
+              </button>
+              <button
+                class="payment-btn"
+                [class.active]="metodoPagoSeleccionado === 'YAPE'"
+                (click)="seleccionarMetodoPago('YAPE')"
+              >
+                <span class="payment-icon yape">Y</span>
+                <span>Yape</span>
+              </button>
+              <button
+                class="payment-btn"
+                [class.active]="metodoPagoSeleccionado === 'PLIN'"
+                (click)="seleccionarMetodoPago('PLIN')"
+              >
+                <span class="payment-icon plin">P</span>
+                <span>Plin</span>
+              </button>
+            </div>
+
+            <!-- ========== TARJETA ========== -->
+            <div
+              class="payment-form"
+              *ngIf="metodoPagoSeleccionado === 'TARJETA'"
+            >
+              <h4 class="payment-form-title">Datos de la tarjeta</h4>
+
+              <div class="form-group">
+                <label>Número de tarjeta</label>
+
+                <input
+                  type="text"
+                  class="form-input"
+                  [class.error]="erroresTarjeta.numero"
+                  placeholder="1234 5678 9012 3456"
+                  [(ngModel)]="datosTarjeta.numero"
+                  (input)="formatearNumeroTarjeta($event)"
+                  (blur)="validarNumeroTarjeta()"
+                  maxlength="19"
+                />
+
+                <span class="error-message" *ngIf="erroresTarjeta.numero">
+                  {{ erroresTarjeta.numero }}
+                </span>
+              </div>
+
+              <div class="form-group">
+                <label>Nombre del titular</label>
+
+                <input
+                  type="text"
+                  class="form-input"
+                  [class.error]="erroresTarjeta.nombre"
+                  placeholder="ALEJANDRO GUILLERMO"
+                  [(ngModel)]="datosTarjeta.nombre"
+                  (input)="validarNombreTitular()"
+                  (blur)="validarNombreTitular()"
+                  style="text-transform: uppercase"
+                />
+
+                <span class="error-message" *ngIf="erroresTarjeta.nombre">
+                  {{ erroresTarjeta.nombre }}
+                </span>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Fecha de expiración</label>
+
+                  <input
+                    type="text"
+                    class="form-input"
+                    [class.error]="erroresTarjeta.fechaExpiracion"
+                    placeholder="MM/AA"
+                    [(ngModel)]="datosTarjeta.fechaExpiracion"
+                    (input)="formatearFechaExpiracion($event)"
+                    (blur)="validarFechaExpiracion()"
+                    maxlength="5"
+                  />
+                  <span
+                    class="error-message"
+                    *ngIf="erroresTarjeta.fechaExpiracion"
+                  >
+                    {{ erroresTarjeta.fechaExpiracion }}
+                  </span>
+                </div>
+
+                <div class="form-group">
+                  <label>CVV</label>
+
+                  <input
+                    type="password"
+                    class="form-input"
+                    [class.error]="erroresTarjeta.cvv"
+                    placeholder="123"
+                    [(ngModel)]="datosTarjeta.cvv"
+                    (keypress)="soloNumeros($event)"
+                    (input)="validarCVV()"
+                    (blur)="validarCVV()"
+                    maxlength="4"
+                  />
+
+                  <span class="error-message" *ngIf="erroresTarjeta.cvv">
+                    {{ erroresTarjeta.cvv }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="card-icons">
+                <span class="card-icon">💳 Visa</span>
+                <span class="card-icon">💳 Mastercard</span>
+                <span class="card-icon">💳 American Express</span>
+              </div>
+            </div>
+
+            <!-- ========== YAPE - QR ESTÁTICO + CAPTURA ========== -->
+            <div class="payment-form" *ngIf="metodoPagoSeleccionado === 'YAPE'">
+              <!-- Mostrar QR si aún no hay captura -->
+              <div *ngIf="!imagenPreview">
+                
+                <h4 class="payment-form-title">
+                  Escanea el código QR con Yape
+                </h4>
+                <div class="qr-container">
+                  <img [src]="qrYapeUrl" alt="QR Yape" class="qr-code" />
+                  <p class="qr-instructions">
+                    Abre tu app de Yape y escanea el código para pagar
+                    <strong>S/ 15.00</strong>
+                  </p>
+                  <div class="yape-badge">
+                    <span class="yape-icon">Y</span>
+                    <span>Pago mediante Yape</span>
+                  </div>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                  <h6><i class="bi bi-info-circle me-2"></i>Instrucciones:</h6>
+                  <ol class="mb-0">
+                    <li>Abre tu app de Yape</li>
+                    <li>Escanea este código QR</li>
+                    <li>Ingresa el monto: <strong>S/ 15.00</strong></li>
+                    <li>Completa el pago</li>
+                    <li>Toma captura del comprobante</li>
+                    <li>Sube la captura aquí ↓</li>
+                  </ol>
+                </div>
+
+                <!-- Botón para subir captura -->
+                <div class="text-center mt-3">
+                  <label
+                    for="capturaYapeInput"
+                    class="btn btn-success btn-lg w-100"
+                  >
+                    <i class="bi bi-upload me-2"></i>
+                    Subir comprobante de Yape
+                  </label>
+                  <input
+                    type="file"
+                    id="capturaYapeInput"
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                    style="display: none"
+                  />
+                </div>
+              </div>
+
+              <!-- Preview de captura subida -->
+              <div *ngIf="imagenPreview && !procesandoPago">
+                
+                <h4 class="payment-form-title">Verificar comprobante</h4>
+                <div class="captura-preview-container">
+                  <img  [src]="imagenPreview" alt="Comprobante Yape" class="captura-preview" />
+                </div>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Verifica que la captura:</strong>
+                  <ul class="mb-0">
+                    <li>Sea clara y legible</li>
+                    <li>Muestre el monto: <strong>S/ 15.00</strong></li>
+                    <li>Muestre el código de operación</li>
+                    <li>Muestre la fecha y hora</li>
+                  </ul>
+                </div>
+
+                <div class="d-grid gap-2 mt-3">
+                  <button
+                    class="btn btn-primary btn-lg"
+                    (click)="confirmarPago()"
+                    [disabled]="loading"
+                  >
+                    <span *ngIf="!loading">
+                      <i class="bi bi-check-circle me-2"></i>
+                      Validar y confirmar pago
+                    </span>
+                    <span *ngIf="loading">
+                      <span
+                        class="spinner-border spinner-border-sm me-2"
+                      ></span>
+                      Validando...
+                    </span>
+                  </button>
+
+                  <label
+                    for="capturaYapeInput2"
+                    class="btn btn-outline-secondary"
+                  >
+                    <i class="bi bi-arrow-repeat me-2"></i>
+                    Cambiar imagen
+                  </label>
+                  <input
+                    type="file"
+                    id="capturaYapeInput2"
+                    accept="image/*"
+                    style="display: none"
+                    (change)="onFileSelected($event)"
+                  />
+                 
+                </div>
+              </div>
+
+              <!-- Procesando -->
+              <div *ngIf="procesandoPago" class="text-center py-4">
+                <div
+                  class="spinner-border text-success mb-3"
+                  style="width: 3rem; height: 3rem"
+                ></div>
+                <h5>Validando tu pago...</h5>
+                <p class="text-muted">
+                  Estamos verificando automáticamente tu comprobante
+                </p>
+                <div class="progress mt-3" style="height: 8px">
+                  <div
+                    class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                    style="width: 100%"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Error de validación -->
+              <div *ngIf="errorPago"  class="alert alert-danger mt-3">
+                
+                <h6><i class="bi bi-x-circle me-2"></i>Pago rechazado</h6>
+                <p class="mb-0">{{ errorPago }}</p>
+                <!---->
+                <button  (click)="intentarNuevamente()" class="btn btn-sm btn-outline-danger mt-2">
+                  <!---->
+                  Intentar con otra captura
+                </button>
+              </div>
+            </div>
+
+            <!-- ========== PLIN - QR ESTÁTICO + CAPTURA ========== -->
+            <div class="payment-form" *ngIf="metodoPagoSeleccionado === 'PLIN'">
+              <!-- Mostrar QR si aún no hay captura -->
+              <div *ngIf="!imagenPreview">
+                
+                <h4 class="payment-form-title">
+                  Escanea el código QR con Plin
+                </h4>
+                <div class="qr-container">
+                  <img
+                    [src]="qrPlinUrl"
+                    alt="QR Plin"
+                    class="qr-code"
+                  />
+                  <p class="qr-instructions">
+                    Abre tu app de Plin y escanea el código para pagar
+                    <strong>S/ 15.00</strong>
+                  </p>
+                  <div class="plin-badge">
+                    <span class="plin-icon">P</span>
+                    <span>Pago mediante Plin</span>
+                  </div>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                  <h6><i class="bi bi-info-circle me-2"></i>Instrucciones:</h6>
+                  <ol class="mb-0">
+                    <li>Abre tu app de Plin</li>
+                    <li>Escanea este código QR</li>
+                    <li>Ingresa el monto: <strong>S/ 15.00</strong></li>
+                    <li>Completa el pago</li>
+                    <li>Toma captura del comprobante</li>
+                    <li>Sube la captura aquí ↓</li>
+                  </ol>
+                </div>
+
+                <!-- Botón para subir captura -->
+                <div class="text-center mt-3">
+                  <label
+                    for="capturaPlinInput"
+                    class="btn btn-primary btn-lg w-100"
+                  >
+                    <i class="bi bi-upload me-2"></i>
+                    Subir comprobante de Plin
+                  </label>
+                  <input
+                    type="file"
+                    id="capturaPlinInput"
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                    style="display: none"
+                  />
+                  <!---->
+                </div>
+              </div>
+
+              <!-- Preview de captura subida -->
+              <div  *ngIf="imagenPreview && !procesandoPago">
+                <!---->
+                <h4 class="payment-form-title">Verificar comprobante</h4>
+                <div class="captura-preview-container">
+                  <img alt="Comprobante Plin" class="captura-preview" />
+                </div>
+
+                <div class="alert alert-warning mt-3">
+                  <strong>Verifica que la captura:</strong>
+                  <ul class="mb-0">
+                    <li>Sea clara y legible</li>
+                    <li>Muestre el monto: <strong>S/ 15.00</strong></li>
+                    <li>Muestre el código de operación</li>
+                    <li>Muestre la fecha y hora</li>
+                  </ul>
+                </div>
+
+                <div class="d-grid gap-2 mt-3">
+                  <button
+                    class="btn btn-primary btn-lg"
+                    (click)="confirmarPago()"
+                    [disabled]="loading"
+                  >
+                    <span *ngIf="!loading">
+                      <i class="bi bi-check-circle me-2"></i>
+                      Validar y confirmar pago
+                    </span>
+                    <span *ngIf="loading">
+                      <span
+                        class="spinner-border spinner-border-sm me-2"
+                      ></span>
+                      Validando...
+                    </span>
+                  </button>
+
+                  <label
+                    for="capturaPlinInput2"
+                    class="btn btn-outline-secondary"
+                  >
+                    <i class="bi bi-arrow-repeat me-2"></i>
+                    Cambiar imagen
+                  </label>
+                  <input
+                    type="file"
+                    id="capturaPlinInput2"
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                    style="display: none"
+                  />
+                  <!---->
+                </div>
+              </div>
+
+              <!-- Procesando -->
+              <div *ngIf="procesandoPago" class="text-center py-4">
+                <div
+                  class="spinner-border text-primary mb-3"
+                  style="width: 3rem; height: 3rem"
+                ></div>
+                <h5>Validando tu pago...</h5>
+                <p class="text-muted">
+                  Estamos verificando automáticamente tu comprobante
+                </p>
+                <div class="progress mt-3" style="height: 8px">
+                  <div
+                    class="progress-bar progress-bar-striped progress-bar-animated"
+                    style="width: 100%"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Error de validación -->
+              <div  *ngIf="errorPago" class="alert alert-danger mt-3">
+                <!---->
+                <h6><i class="bi bi-x-circle me-2"></i>Pago rechazado</h6>
+                <p class="mb-0">{{ errorPago }}</p>
+                <!---->
+                <button (click)="intentarNuevamente()" class="btn btn-sm btn-outline-danger mt-2">
+                  <!---->
+                  Intentar con otra captura
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones de navegación -->
+          <div class="action-buttons">
+            <button class="btn-back" (click)="previousStep()">Atrás</button>
+
+            <button
+              class="btn-confirm"
+              [disabled]="!puedeConfirmarPago() || procesandoPago"
+              (click)="confirmarPago()"
+            >
+              {{ procesandoPago ? "Procesando..." : "Confirmar y Pagar" }}
+            </button>
+          </div>
+        </div>
+
+
+      </div>
+              <!-- Resumen (Sidebar) -->
+        <div class="summary-card">
+          <h3 class="summary-title">Resumen de Reserva</h3>
+
+          <div class="summary-item">
+            <span class="summary-icon">👥</span>
+            <span class="summary-label">Personas</span>
+            <span class="summary-value">{{ personas }}</span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-icon">🪑</span>
+            <span class="summary-label">Mesa</span>
+            <span class="summary-value">{{ getMesaNumero() }}</span>
+          </div>
+
+          <div class="summary-item" *ngIf="mesaSeleccionada">
+            <span class="summary-icon">📍</span>
+            <span class="summary-label">Zona</span>
+            <span class="summary-value">{{ getMesaZona() }}</span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-icon">📅</span>
+            <span class="summary-label">Fecha</span>
+            <span class="summary-value">{{
+              selectedDate ? formatDate(selectedDate) : "No seleccionada"
+            }}</span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-icon">🕐</span>
+            <span class="summary-label">Hora</span>
+            <span class="summary-value">{{
+              selectedTime ? selectedTime.time : "No seleccionada"
+            }}</span>
+          </div>
+
+          <div class="summary-item">
+            <span class="summary-icon">⏱️</span>
+            <span class="summary-label">Duración</span>
+            <span class="summary-value">2 horas</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <div class="restaurant-info">
+            <img
+              src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=100&h=100&fit=crop"
+              alt="KoroFood"
+              class="restaurant-image"
+            />
+            <div class="restaurant-details">
+              <h4 class="restaurant-name">KoroFood</h4>
+              <p class="restaurant-type">Cocina Asiática</p>
+            </div>
+          </div>
+
+          <div class="restaurant-contact">
+            <div class="contact-item">
+              <span class="contact-icon">📍</span>
+              <span>Av. Larco 123, Miraflores</span>
+            </div>
+            <div class="contact-item">
+              <span class="contact-icon">📞</span>
+              <span>+51 1 234-5678</span>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+
+
+</section>
+  <!-- ALERTA PERSONALIZADA -->
+  <div
+    class="koro-alerta"
+    [class.koro-exito]="alertaTipo === 'exito'"
+    [class.koro-error]="alertaTipo === 'error'"
+    [class.koro-mostrar]="mostrarAlerta"
+    *ngIf="mostrarAlerta"
+  >
+    <!-- Alerta de Éxito -->
+    <ng-container *ngIf="alertaTipo === 'exito'">
+      <div class="koro-icono">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+          <circle
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="2"
+          />
+          <path
+            d="M8 12l2.5 2.5L16 9"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+      </div>
+      <div class="koro-contenido">
+        <h3>¡Reserva Confirmada!</h3>
+        <div class="koro-detalles">
+          <p>
+            <strong>Número de reserva:</strong> #{{ alertaDatos.idReserva }}
+          </p>
+          <p><strong>Mesa:</strong> {{ alertaDatos.numeroMesa }}</p>
+          <p><strong>Fecha:</strong> {{ alertaDatos.fecha }}</p>
+          <p><strong>Hora:</strong> {{ alertaDatos.hora }}</p>
+        </div>
+        <p class="koro-mensaje">¡Te esperamos!</p>
+      </div>
+    </ng-container>
+
+    <!-- Alerta de Error -->
+    <ng-container *ngIf="alertaTipo === 'error'">
+      <div class="koro-icono">
+      </div>
+      <div class="koro-contenido">
+        <h3>Error en la Reserva</h3>
+        <p class="koro-mensaje">{{ alertaDatos.mensaje }}</p>
+      </div>
+    </ng-container>
+  </div>

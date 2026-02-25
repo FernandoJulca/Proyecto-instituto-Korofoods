@@ -1,0 +1,64 @@
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-2 sidebar">
+      <div class="sidebar-content">
+        <div class="sidebar-header">
+          <h5>
+            <i class="fa-solid fa-shield-halved me-2"></i>
+            Panel de Recepcionista
+          </h5>
+        </div>
+
+        <ul class="nav flex-column sidebar-nav">
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [class.active]="currentRoute === 'home'"
+              (click)="navigateToHome()"
+            >
+              <i class="fa-solid fa-home"></i>
+              <span>Inicio</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [class.active]="currentRoute === 'list'"
+              (click)="navigateToList()"
+            >
+              <i class="fa-solid fa-list"></i>
+              <span>Reservas Asistidas</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [class.active]="currentRoute === 'chat'"
+              (click)="navigateToChat()"
+            >
+              <i class="fa-solid fa-message"></i>
+              <span>Mensajes</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <button class="btn btn-logout w-100" (click)="logout()">
+            <i class="fa-solid fa-right-from-bracket me-2"></i>
+            Cerrar sesión
+          </button>
+          <div class="user-info mt-3">
+            <i class="fa-solid fa-user-circle me-2"></i>
+            <span>Recepcionista</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="col-md-10 main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

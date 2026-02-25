@@ -1,0 +1,153 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="bi bi-file-earmark-pdf"></i> Reporte de Reservas
+          </h4>
+        </div>
+        <div class="card-body">
+          <!-- Mensaje de error -->
+          <div
+            *ngIf="error"
+            class="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            {{ error }}
+            <button
+              type="button"
+              class="btn-close"
+              (click)="error = ''"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <!-- Instrucciones -->
+          <div class="alert alert-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Selecciona los filtros y haz clic en "Generar Reporte" para
+            descargar el PDF.
+          </div>
+
+          <form [formGroup]="reporteForm" (ngSubmit)="generarReporte()">
+            <!-- Rango de fechas -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="fechaInicio" class="form-label">
+                  Fecha Inicio <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaInicio"
+                  formControlName="fechaInicio"
+                  [class.is-invalid]="
+                    fechaInicio?.invalid && fechaInicio?.touched
+                  "
+                />
+                <div
+                  *ngIf="fechaInicio?.invalid && fechaInicio?.touched"
+                  class="invalid-feedback"
+                >
+                  La fecha de inicio es obligatoria
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="fechaFin" class="form-label">
+                  Fecha Fin <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="fechaFin"
+                  formControlName="fechaFin"
+                  [class.is-invalid]="fechaFin?.invalid && fechaFin?.touched"
+                />
+                <div
+                  *ngIf="fechaFin?.invalid && fechaFin?.touched"
+                  class="invalid-feedback"
+                >
+                  La fecha de fin es obligatoria
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtros opcionales -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label for="estado" class="form-label">Estado</label>
+                <select
+                  class="form-select"
+                  id="estado"
+                  formControlName="estado"
+                >
+                  <option *ngFor="let estado of estados" [value]="estado.value">
+                    {{ estado.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label for="zona" class="form-label">Zona</label>
+                <select class="form-select" id="zona" formControlName="zona">
+                  <option *ngFor="let zona of zonas" [value]="zona.value">
+                    {{ zona.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2 justify-content-end">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                routerLink="/admin/reportes"
+              >
+                <i class="bi bi-arrow-left"></i> Volver
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="loading || reporteForm.invalid"
+              >
+                <span *ngIf="loading">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Generando...
+                </span>
+                <span *ngIf="!loading">
+                  <i class="bi bi-download me-2"></i>
+                  Generar Reporte
+                </span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Preview de filtros seleccionados -->
+          <div class="mt-4 p-3 bg-light rounded" *ngIf="reporteForm.valid">
+            <h6 class="mb-3">
+              <i class="bi bi-funnel"></i> Filtros seleccionados:
+            </h6>
+            <ul class="mb-0">
+              <li>
+                <strong>Período:</strong>
+                {{ reporteForm.value.fechaInicio | date: "dd/MM/yyyy" }} -
+                {{ reporteForm.value.fechaFin | date: "dd/MM/yyyy" }}
+              </li>
+              <li>
+                <strong>Estado:</strong>
+                {{ estadoLabel }}
+              </li>
+              <li>
+                <strong>Zona:</strong>
+                {{ zonaLabel }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

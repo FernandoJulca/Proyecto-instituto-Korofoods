@@ -1,0 +1,109 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Gestión de Eventos</h3>
+    <a routerLink="/admin/eventos/nuevo" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Nuevo Evento
+    </a>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Tabla de eventos -->
+  <div *ngIf="!loading" class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Imagen</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Temática</th>
+              <th>Fecha Inicio</th>
+              <th>Fecha Fin</th>
+              <th>Costo</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let evento of eventos">
+              <td>{{ evento.idEvento }}</td>
+              
+              <!-- COLUMNA DE IMAGEN -->
+              <td>
+                <div class="evento-imagen-container">
+                  <img 
+                    *ngIf="evento.imagen" 
+                    [src]="evento.imagen" 
+                    [alt]="evento.nombre"
+                    class="evento-imagen-thumbnail w-100"
+                    (error)="onImageError($event)" >
+                  <div *ngIf="!evento.imagen" class="evento-sin-imagen">
+                    <i class="bi bi-image"></i>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <strong>{{ evento.nombre }}</strong>
+              </td>
+              <td>
+                <span class="text-truncate-descripcion" [title]="evento.descripcion">
+                  {{ evento.descripcion || '-' }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="evento.tematica" class="badge bg-info">
+                  {{ evento.tematica.nombre }}
+                </span>
+                <span *ngIf="!evento.tematica" class="text-muted">Sin temática</span>
+              </td>
+              <td>{{ formatearFecha(evento.fechaInicio) }}</td>
+              <td>{{ formatearFecha(evento.fechaFin) }}</td>
+              <td>{{ formatearCosto(evento.costo) }}</td>
+              <td>
+                <span [class]="evento.activo ? 'badge bg-success' : 'badge bg-secondary'">
+                  {{ evento.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a 
+                    [routerLink]="['/admin/eventos/editar', evento.idEvento]" 
+                    class="btn btn-sm btn-warning"
+                    title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button 
+                    (click)="confirmarEliminar(evento)" 
+                    class="btn btn-sm btn-danger"
+                    title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="eventos.length === 0">
+              <td colspan="10" class="text-center text-muted py-4">
+                No hay eventos registrados
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

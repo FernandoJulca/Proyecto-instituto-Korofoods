@@ -1,0 +1,53 @@
+-- Crear tabla con validación 100% automática
+CREATE TABLE TB_PAGO (
+    -- Identificadores
+    ID_PAGO SERIAL PRIMARY KEY,
+    ID_USUARIO INT NOT NULL,
+    ID_RESERVA INT NULL,
+    ID_PEDIDO INT NULL,
+    
+    -- Datos del pago
+    TIPO_PAGO VARCHAR(20) NOT NULL CHECK (TIPO_PAGO IN ('DR', 'PP')),
+    MONTO DECIMAL(10,2) NOT NULL,
+    METODO_PAGO VARCHAR(20) NOT NULL CHECK (METODO_PAGO IN ('YAPE', 'PLIN', 'EFECTIVO', 'TARJETA')),
+    
+    -- Estados simplificados (sin validación manual)
+    ESTADO VARCHAR(3) NOT NULL CHECK (ESTADO IN ('PEN', 'PAG', 'REC', 'ANU', 'EXP')),
+    
+    -- Validación y seguimiento
+    CODIGO_OPERACION VARCHAR(100) UNIQUE,
+    REFERENCIA_PAGO VARCHAR(100) UNIQUE NOT NULL,
+    
+    -- Fechas
+    FECHA_PAGO TIMESTAMP NULL,
+    FECHA_CREACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FECHA_EXPIRACION TIMESTAMP NULL,
+    
+    -- Captura y OCR
+    URL_CAPTURA VARCHAR(500),
+    HASH_IMAGEN VARCHAR(64) UNIQUE,
+    TEXTO_EXTRAIDO TEXT,
+    MONTO_DETECTADO DECIMAL(10,2),
+    FECHA_DETECTADA TIMESTAMP,
+    
+    -- Motivo de rechazo (para que el usuario sepa qué corregir)
+    MOTIVO_RECHAZO TEXT,
+    
+    -- Observaciones
+    OBSERVACIONES TEXT,
+    
+    -- Constraints
+    CHECK (
+        (ID_RESERVA IS NOT NULL AND ID_PEDIDO IS NULL AND TIPO_PAGO = 'DR') OR
+        (ID_PEDIDO IS NOT NULL AND ID_RESERVA IS NULL AND TIPO_PAGO = 'PP')
+    )
+);
+
+-- Índices
+CREATE INDEX idx_pago_usuario ON TB_PAGO(ID_USUARIO);
+CREATE INDEX idx_pago_reserva ON TB_PAGO(ID_RESERVA);
+CREATE INDEX idx_pago_pedido ON TB_PAGO(ID_PEDIDO);
+CREATE INDEX idx_pago_estado ON TB_PAGO(ESTADO);
+CREATE INDEX idx_pago_referencia ON TB_PAGO(REFERENCIA_PAGO);
+CREATE INDEX idx_pago_codigo_operacion ON TB_PAGO(CODIGO_OPERACION);
+CREATE INDEX idx_pago_hash ON TB_PAGO(HASH_IMAGEN);

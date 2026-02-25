@@ -1,0 +1,143 @@
+<!-- crudMenus/plato-form/plato-form.component.html -->
+
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">{{ isEditMode ? 'Editar Plato' : 'Nuevo Plato' }}</h4>
+        </div>
+        <div class="card-body">
+          <!-- Mensaje de error -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+          </div>
+
+          <form [formGroup]="platoForm" (ngSubmit)="onSubmit()">
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                id="nombre" 
+                formControlName="nombre"
+                [class.is-invalid]="nombre?.invalid && nombre?.touched">
+              <div *ngIf="nombre?.invalid && nombre?.touched" class="invalid-feedback">
+                <div *ngIf="nombre?.errors?.['required']">El nombre es obligatorio</div>
+                <div *ngIf="nombre?.errors?.['maxlength']">
+                  El nombre no puede exceder 100 caracteres
+                </div>
+              </div>
+            </div>
+
+            <!-- Tipo de Plato -->
+            <div class="mb-3">
+              <label for="tipoPlato" class="form-label">Tipo de Plato <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                id="tipoPlato" 
+                formControlName="tipoPlato"
+                [class.is-invalid]="tipoPlato?.invalid && tipoPlato?.touched">
+                <option value="">Seleccione un tipo</option>
+                <option *ngFor="let tipo of tiposPlato" [value]="tipo.value">
+                  {{ tipo.label }}
+                </option>
+              </select>
+              <div *ngIf="tipoPlato?.invalid && tipoPlato?.touched" class="invalid-feedback">
+                <div *ngIf="tipoPlato?.errors?.['required']">El tipo de plato es obligatorio</div>
+              </div>
+            </div>
+
+            <!-- Precio y Stock en la misma fila -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="precio" class="form-label">Precio (S/.) <span class="text-danger">*</span></label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="precio" 
+                    formControlName="precio"
+                    step="0.01"
+                    [class.is-invalid]="precio?.invalid && precio?.touched">
+                  <div *ngIf="precio?.invalid && precio?.touched" class="invalid-feedback">
+                    <div *ngIf="precio?.errors?.['required']">El precio es obligatorio</div>
+                    <div *ngIf="precio?.errors?.['min']">El precio debe ser mayor a 0</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="stock" class="form-label">Stock <span class="text-danger">*</span></label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="stock" 
+                    formControlName="stock"
+                    [class.is-invalid]="stock?.invalid && stock?.touched">
+                  <div *ngIf="stock?.invalid && stock?.touched" class="invalid-feedback">
+                    <div *ngIf="stock?.errors?.['required']">El stock es obligatorio</div>
+                    <div *ngIf="stock?.errors?.['min']">El stock no puede ser negativo</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- URL Imagen -->
+            <div class="mb-3">
+              <label class="form-label">Imagen del Plato</label>
+              
+              <!-- Preview de imagen -->
+              <div *ngIf="imagenPreview" class="imagen-preview-container mb-3">
+                <img [src]="imagenPreview" alt="Preview" class="imagen-preview w-100">
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-danger mt-2"
+                  (click)="removerImagen()">
+                  <i class="bi bi-trash"></i> Remover imagen
+                </button>
+              </div>
+
+              <!-- Botón para seleccionar imagen -->
+              <div *ngIf="!imagenPreview">
+                <label for="imagenInput" class="btn btn-outline-primary">
+                  <i class="bi bi-upload"></i> Seleccionar imagen
+                </label>
+                <input 
+                  type="file" 
+                  id="imagenInput" 
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  style="display: none;">
+                <small class="form-text text-muted d-block mt-2">
+                  Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB.
+                </small>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2 justify-content-end">
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                (click)="cancelar()"
+                [disabled]="loading">
+                Cancelar
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="loading || platoForm.invalid">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

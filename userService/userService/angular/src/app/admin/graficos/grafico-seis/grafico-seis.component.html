@@ -1,0 +1,55 @@
+<link
+  href="https://fonts.googleapis.com/icon?family=Material+Icons"
+  rel="stylesheet"
+/>
+<div class="ranking-container">
+  <h3 class="titulo">Ranking de Platos</h3>
+
+  <div
+    class="plato-item"
+    *ngFor="let plato of datos; let i = index"
+    [class]="'plato-item pos-' + i"
+  >
+    <!-- Medalla -->
+    <span
+      class="material-icons medalla"
+      [ngClass]="{
+        oro: i === 0,
+        plata: i === 1,
+        bronce: i === 2,
+        otro: i > 2,
+      }"
+    >
+      {{ i < 3 ? "emoji_events" : "tag" }}
+    </span>
+    <span
+      *ngIf="i >= 3"
+      style="font-size: 0.8rem; font-weight: 700; color: #bbb; min-width: 20px"
+    >
+      {{ i + 1 }}
+    </span>
+
+    <div class="plato-info">
+      <span class="nombre">{{ plato.nombre }}</span>
+      <div class="estrellas">
+        <span
+          *ngFor="let estrella of getEstrellas(plato.promedio)"
+          class="material-icons estrella"
+          [class.rellena]="estrella.rellena"
+        >
+          {{ estrella.rellena ? "star" : "star_border" }}
+        </span>
+        <span class="promedio-texto"
+          >({{ plato.promedio | number: "1.1-1" }})</span
+        >
+      </div>
+    </div>
+
+    <span class="votos">
+      <span class="material-icons">group</span>
+      {{ plato.total }}
+    </span>
+  </div>
+
+  <p class="vacio" *ngIf="datos.length === 0">Sin datos este mes</p>
+</div>

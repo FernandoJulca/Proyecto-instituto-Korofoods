@@ -1,0 +1,237 @@
+<div class="listado-container">
+
+  <!-- ── HEADER ── -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Reservas Asistidas</h1>
+      <p class="page-subtitle">
+        <i class="fa-regular fa-calendar"></i>
+        {{ fechaFormateada }}
+      </p>
+    </div>
+    <button class="btn-verificar" (click)="abrirModalVerificar()">
+      <i class="fa-solid fa-qrcode"></i>
+      Verificar Reserva
+    </button>
+  </div>
+
+  <!-- ── FILTROS ── -->
+  <div class="filtros-bar">
+    <!-- Filtro tipo -->
+    <div class="filtro-tipo">
+      <button
+        class="tipo-btn"
+        [class.activo]="filtroTipo === 'AMBAS'"
+        (click)="cambiarFiltroTipo('AMBAS')"
+      >
+        <i class="fa-solid fa-layer-group"></i> Ambas
+      </button>
+      <button
+        class="tipo-btn"
+        [class.activo]="filtroTipo === 'SIMPLE'"
+        (click)="cambiarFiltroTipo('SIMPLE')"
+      >
+        <i class="fa-solid fa-chair"></i> Simples
+      </button>
+      <button
+        class="tipo-btn"
+        [class.activo]="filtroTipo === 'ESPECIAL'"
+        (click)="cambiarFiltroTipo('ESPECIAL')"
+      >
+        <i class="fa-solid fa-star"></i> Especiales
+      </button>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="search-wrapper">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar por cliente, mesa, evento..."
+        [(ngModel)]="textoBusqueda"
+        (input)="aplicarFiltros()"
+      />
+      @if (textoBusqueda) {
+        <button class="search-clear" (click)="limpiarBusqueda()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── ESTADO CARGA ── -->
+  @if (loading) {
+    <div class="state-box">
+      <div class="spinner"></div>
+      <p>Cargando reservas del día...</p>
+    </div>
+  }
+
+  @if (error && !loading) {
+    <div class="state-box state-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="cargarReservas()">Reintentar</button>
+    </div>
+  }
+
+  <!-- ── TABLA ── -->
+  @if (!loading && !error) {
+    <div class="tabla-wrapper">
+
+      @if (reservasFiltradas.length === 0) {
+        <div class="state-box">
+          <i class="fa-regular fa-folder-open"></i>
+          <p>No se encontraron reservas asistidas para hoy.</p>
+        </div>
+      } @else {
+        <div class="tabla-info">
+          <span class="total-badge">{{ reservasFiltradas.length }} resultado{{ reservasFiltradas.length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="tabla-scroll">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Cliente</th>
+                <th>Fecha Reserva</th>
+                <th>Observaciones</th>
+                <th>Mesa</th>
+                <th>Zona</th>
+                @if (filtroTipo === 'ESPECIAL' || filtroTipo === 'AMBAS') {
+                  <th>Evento</th>
+                  <th>Temática</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (reserva of reservasFiltradas; track reserva.idReserva; let i = $index) {
+                <tr class="tabla-row">
+                  <td>
+                    <span class="num-badge">{{ reserva.idReserva }}</span>
+                  </td>
+                  <td>
+                    <div class="cliente-cell">
+                      <div class="cliente-avatar">{{ getIniciales(reserva.nombreCliente) }}</div>
+                      <span class="cliente-nombre">{{ reserva.nombreCliente }}</span>
+                    </div>
+                  </td>
+                  <td class="fecha-cell">
+                    <span class="fecha">{{ formatearFecha(reserva.fechaReserva) }}</span>
+                    <span class="hora">{{ formatearHora(reserva.fechaReserva) }}</span>
+                  </td>
+                  <td>
+                    <span class="obs-text">{{ reserva.observaciones || '—' }}</span>
+                  </td>
+                  <td>
+                    <span class="mesa-badge">Mesa {{ reserva.mesa }}</span>
+                  </td>
+                  <td>
+                    <span class="zona-text">{{ reserva.zona || '—' }}</span>
+                  </td>
+                  @if (filtroTipo === 'ESPECIAL' || filtroTipo === 'AMBAS') {
+                    <td>
+                      <span [class]="reserva.tipoReserva === 'ESPECIAL' ? 'evento-tag' : 'ninguno-tag'">
+                        {{ reserva.evento || 'Ninguno' }}
+                      </span>
+                    </td>
+                    <td>
+                      <span [class]="reserva.tipoReserva === 'ESPECIAL' ? 'tematica-tag' : 'ninguno-tag'">
+                        {{ reserva.tematica || 'Ninguno' }}
+                      </span>
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- MODAL VERIFICAR RESERVA                        -->
+<!-- ══════════════════════════════════════════════ -->
+@if (modalAbierto) {
+  <div class="modal-backdrop" (click)="cerrarModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <div>
+            <h2 class="modal-title">Verificar Reserva Pagada</h2>
+            <p class="modal-subtitle">Ingresa el código enviado al cliente</p>
+          </div>
+        </div>
+        <button class="modal-close" (click)="cerrarModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Alerta de resultado -->
+        @if (alertaVerificacion) {
+          <div class="alerta" [class]="alertaVerificacion.clase">
+            <i [class]="alertaVerificacion.icono"></i>
+            <span>{{ alertaVerificacion.mensaje }}</span>
+          </div>
+        }
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-key"></i>
+            Código enviado
+          </label>
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Ej: ABC123"
+            [(ngModel)]="codigoIngresado"
+            [disabled]="verificando"
+            (keyup.enter)="confirmarVerificacion()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <i class="fa-solid fa-hashtag"></i>
+            Número de Reserva
+          </label>
+          <input
+            type="number"
+            class="form-input"
+            placeholder="Ej: 42"
+            [(ngModel)]="idReservaInput"
+            [disabled]="verificando"
+            (keyup.enter)="confirmarVerificacion()"
+          />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancelar" (click)="cerrarModal()" [disabled]="verificando">
+          Cancelar
+        </button>
+        <button
+          class="btn-confirmar"
+          (click)="confirmarVerificacion()"
+          [disabled]="!codigoIngresado || !idReservaInput || verificando"
+        >
+          @if (verificando) {
+            <span class="spinner-sm"></span> Verificando...
+          } @else {
+            <i class="fa-solid fa-circle-check"></i> Confirmar
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

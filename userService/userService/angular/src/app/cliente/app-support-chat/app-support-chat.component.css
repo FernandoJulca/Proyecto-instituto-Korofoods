@@ -1,0 +1,660 @@
+/* ============================================
+   KORO SUPPORT CHAT - ESTILOS NARANJA/BLANCO
+   ============================================ */
+
+/* ============================================
+   CONTENEDOR PRINCIPAL
+   ============================================ */
+.koro-chat-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+/* ============================================
+   BOTÓN FLOTANTE
+   ============================================ */
+.koro-chat-toggle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF8A3D 0%, #E67422 100%);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(255, 138, 61, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: koro-chat-pulse 2s infinite;
+}
+
+.koro-chat-toggle:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 12px 40px rgba(255, 138, 61, 0.35);
+}
+
+.koro-chat-toggle:active {
+    transform: scale(0.95);
+}
+
+@keyframes koro-chat-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 8px 32px rgba(255, 138, 61, 0.15), 0 0 0 0 rgba(255, 138, 61, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 8px 32px rgba(255, 138, 61, 0.15), 0 0 0 8px rgba(255, 138, 61, 0);
+    }
+}
+
+.koro-chat-icono {
+    width: 32px;
+    height: 32px;
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.koro-chat-toggle:hover .koro-chat-icono {
+    transform: scale(1.1);
+}
+
+.koro-chat-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #DC3545;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+    border: 2px solid white;
+    animation: koro-chat-badge-bounce 0.5s ease;
+}
+
+@keyframes koro-chat-badge-bounce {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+}
+
+/* ============================================
+   VENTANA DE CHAT
+   ============================================ */
+.koro-chat-ventana {
+    width: 380px;
+    height: 600px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(255, 138, 61, 0.15);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: koro-chat-slide-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    border: 2px solid #FFE4D1;
+}
+
+@keyframes koro-chat-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.koro-chat-header {
+    background: linear-gradient(135deg, #FF8A3D 0%, #E67422 100%);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+}
+
+.koro-chat-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: koro-chat-float 6s infinite ease-in-out;
+}
+
+@keyframes koro-chat-float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    50% {
+        transform: translate(-20px, 20px) rotate(180deg);
+    }
+}
+
+.koro-chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.koro-chat-avatar {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.koro-chat-avatar svg {
+    width: 24px;
+    height: 24px;
+    color: #FF8A3D;
+}
+
+.koro-chat-header-text {
+    color: white;
+}
+
+.koro-chat-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    letter-spacing: 0.3px;
+}
+
+.koro-chat-estado {
+    font-size: 12px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.95;
+}
+
+.koro-chat-estado-punto {
+    width: 8px;
+    height: 8px;
+    background: #4CAF50;
+    border-radius: 50%;
+    animation: koro-chat-online-pulse 2s infinite;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+}
+
+@keyframes koro-chat-online-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.koro-chat-cerrar {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.koro-chat-cerrar:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.koro-chat-cerrar svg {
+    width: 18px;
+    height: 18px;
+    color: white;
+}
+
+/* ============================================
+   TABS
+   ============================================ */
+.koro-chat-tabs {
+    background: #FFF8F3;
+    padding: 16px 20px;
+    border-bottom: 2px solid #FFE4D1;
+}
+
+.koro-chat-tabs-titulo {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #FF8A3D;
+    margin: 0 0 12px 0;
+}
+
+.koro-chat-tabs-lista {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.koro-chat-tab {
+    background: white;
+    border: 2px solid #FFE4D1;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #6C757D;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.koro-chat-tab:hover {
+    border-color: #FF8A3D;
+    color: #FF8A3D;
+    transform: translateY(-1px);
+    background: #FFF5EF;
+}
+
+.koro-chat-tab-activo {
+    background: #FF8A3D;
+    border-color: #FF8A3D;
+    color: white;
+    font-weight: 600;
+}
+
+/* ============================================
+   ÁREA DE MENSAJES
+   ============================================ */
+.koro-chat-mensajes {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #FFFFFF;
+    scroll-behavior: smooth;
+}
+
+.koro-chat-mensajes::-webkit-scrollbar {
+    width: 6px;
+}
+
+.koro-chat-mensajes::-webkit-scrollbar-track {
+    background: #FFF8F3;
+}
+
+.koro-chat-mensajes::-webkit-scrollbar-thumb {
+    background: #FFE4D1;
+    border-radius: 10px;
+}
+
+.koro-chat-mensajes::-webkit-scrollbar-thumb:hover {
+    background: #FFF5EF;
+}
+
+/* ============================================
+   MENSAJES
+   ============================================ */
+.koro-chat-mensaje {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    animation: koro-chat-mensaje-entrada 0.3s ease;
+}
+
+@keyframes koro-chat-mensaje-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.koro-chat-mensaje-bot {
+    flex-direction: row;
+}
+
+.koro-chat-mensaje-usuario {
+    flex-direction: row-reverse;
+}
+
+.koro-chat-mensaje-avatar {
+    width: 32px;
+    height: 32px;
+    background: #FFF5EF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 2px solid #FFE4D1;
+}
+
+.koro-chat-mensaje-avatar svg {
+    width: 18px;
+    height: 18px;
+    color: #FF8A3D;
+}
+
+.koro-chat-mensaje-contenido {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 70%;
+}
+
+.koro-chat-mensaje-usuario .koro-chat-mensaje-contenido {
+    align-items: flex-end;
+}
+
+.koro-chat-mensaje-burbuja {
+    background: #FFF8F3;
+    padding: 12px 16px;
+    border-radius: 12px;
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid #FFE4D1;
+}
+
+.koro-chat-mensaje-bot .koro-chat-mensaje-burbuja {
+    background: white;
+    border: 2px solid #FFE4D1;
+    border-bottom-left-radius: 4px;
+}
+
+.koro-chat-mensaje-usuario .koro-chat-mensaje-burbuja {
+    background: linear-gradient(135deg, #FF8A3D 0%, #E67422 100%);
+    color: white;
+    border-bottom-right-radius: 4px;
+    border: none;
+}
+
+.koro-chat-mensaje-burbuja p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #2C3E50;
+}
+
+.koro-chat-mensaje-usuario .koro-chat-mensaje-burbuja p {
+    color: white;
+}
+
+.koro-chat-mensaje-burbuja p+p {
+    margin-top: 8px;
+}
+
+.koro-chat-mensaje-hora {
+    font-size: 11px;
+    color: #ADB5BD;
+    padding: 0 4px;
+}
+
+/* ============================================
+   INDICADOR DE ESCRITURA
+   ============================================ */
+.koro-chat-escribiendo {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 12px 16px;
+}
+
+.koro-chat-escribiendo span {
+    width: 8px;
+    height: 8px;
+    background: #FF8A3D;
+    border-radius: 50%;
+    animation: koro-chat-escribiendo-bounce 1.4s infinite ease-in-out;
+}
+
+.koro-chat-escribiendo span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.koro-chat-escribiendo span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes koro-chat-escribiendo-bounce {
+
+    0%,
+    80%,
+    100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+
+    40% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   INPUT AREA
+   ============================================ */
+.koro-chat-input-area {
+    background: #FFFFFF;
+    padding: 16px 20px;
+    border-top: 2px solid #FFE4D1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.koro-chat-adjunto {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #6C757D;
+}
+
+.koro-chat-adjunto:hover {
+    background: #FFF5EF;
+    color: #FF8A3D;
+    transform: rotate(15deg);
+}
+
+.koro-chat-adjunto svg {
+    width: 20px;
+    height: 20px;
+}
+
+.koro-chat-input {
+    flex: 1;
+    border: 2px solid #FFE4D1;
+    background: white;
+    padding: 12px 16px;
+    border-radius: 24px;
+    font-size: 14px;
+    color: #2C3E50;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.koro-chat-input:focus {
+    background: #FFF5EF;
+    border-color: #FF8A3D;
+    box-shadow: 0 0 0 3px rgba(255, 138, 61, 0.1);
+}
+
+.koro-chat-input::placeholder {
+    color: #ADB5BD;
+}
+
+.koro-chat-input:disabled {
+    background: #FFF8F3;
+    cursor: not-allowed;
+}
+
+.koro-chat-enviar {
+    background: linear-gradient(135deg, #FF8A3D 0%, #E67422 100%);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 138, 61, 0.3);
+}
+
+.koro-chat-enviar:hover:not(:disabled) {
+    transform: scale(1.05) rotate(15deg);
+    box-shadow: 0 6px 16px rgba(255, 138, 61, 0.4);
+}
+
+.koro-chat-enviar:active {
+    transform: scale(0.95);
+}
+
+.koro-chat-enviar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.koro-chat-enviar svg {
+    width: 20px;
+    height: 20px;
+    color: white;
+    transform: translateX(1px);
+}
+
+/* ============================================
+   BOTÓN MINIMIZAR
+   ============================================ */
+.koro-chat-minimizar {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FFFFFF;
+    border: 2px solid #FFE4D1;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(255, 138, 61, 0.1);
+    z-index: 10;
+}
+
+.koro-chat-minimizar:hover {
+    background: #FFF5EF;
+    border-color: #FF8A3D;
+    transform: translateX(-50%) translateY(2px);
+}
+
+.koro-chat-minimizar svg {
+    width: 20px;
+    height: 20px;
+    color: #FF8A3D;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 480px) {
+    .koro-chat-widget {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+    }
+
+    .koro-chat-ventana {
+        width: 100%;
+        height: 500px;
+    }
+
+    .koro-chat-toggle {
+        width: 56px;
+        height: 56px;
+    }
+
+    .koro-chat-icono {
+        width: 28px;
+        height: 28px;
+    }
+
+    .koro-chat-mensaje-contenido {
+        max-width: 80%;
+    }
+}
+
+/* ============================================
+   ANIMACIONES ADICIONALES
+   ============================================ */
+@keyframes koro-chat-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+.koro-chat-enviar:disabled:active {
+    animation: koro-chat-shake 0.3s ease;
+}

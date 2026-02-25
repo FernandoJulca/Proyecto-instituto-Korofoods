@@ -1,0 +1,11 @@
+.contenedor-grafico-uno{
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+canvas{
+    display: block;
+    width: 100% !important;
+    height: auto !important;
+}

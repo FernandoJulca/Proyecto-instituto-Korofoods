@@ -1,0 +1,369 @@
+:host {
+    --primary-color: #E67E22;
+    --primary-hover: #D35400;
+    --footer-bg: #4C3427;
+    --text-light: #E0E0E0;
+    --text-white: #FFFFFF;
+}
+
+/* Layout */
+.layout-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navbar Styles */
+.navbar {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.brand-icon {
+    font-size: 2rem;
+    margin-right: 0.5rem;
+}
+
+.brand-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-family: 'Georgia', serif;
+}
+
+.nav-link-custom {
+    color: #6c757d !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-link-custom:hover,
+.nav-link-custom.active {
+    color: var(--primary-color) !important;
+}
+
+.nav-link-custom::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.nav-link-custom:hover::after,
+.nav-link-custom.active::after {
+    width: 80%;
+}
+
+.btn-cuenta {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-cuenta:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3);
+    color: white;
+}
+
+.btn-cuenta i {
+    margin-right: 0.5rem;
+}
+
+/* ─── RESPONSIVE FIXES ─── */
+
+/* Mobile: menú colapsado */
+@media (max-width: 991.98px) {
+    /* El wrapper del navbar debe estar en columna cuando el menú está abierto */
+    .navbar > .justify-content-between {
+        flex-wrap: wrap;
+    }
+
+    /* El collapse ocupa todo el ancho */
+    .navbar-collapse {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.5rem 0;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    /* Links en columna, alineados a la izquierda */
+    .navbar-nav {
+        flex-direction: column !important;
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    .nav-item {
+        width: 100%;
+    }
+
+    .nav-link-custom {
+        padding: 0.75rem 0.5rem !important;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    /* Ocultar el underline animado en mobile (no queda bien) */
+    .nav-link-custom::after {
+        display: none;
+    }
+
+    /* El active en mobile usa un borde izquierdo en lugar del underline */
+    .nav-link-custom.active {
+        border-left: 3px solid var(--primary-color);
+        padding-left: calc(0.5rem - 3px) !important;
+        background-color: rgba(230, 126, 34, 0.05);
+        border-radius: 0 4px 4px 0;
+    }
+
+    /* Botón de cuenta ocupa todo el ancho en mobile */
+    .d-flex.align-items-center.gap-3 {
+        width: 100%;
+        justify-content: center;
+        margin-top: 0.75rem;
+        padding-bottom: 0.25rem;
+    }
+
+    .btn-cuenta {
+        width: 100%;
+        text-align: center;
+    }
+}
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding-top: 76px;
+    /* Height of fixed navbar */
+}
+
+/* Footer Styles */
+.footer {
+    background-color: var(--footer-bg);
+    color: var(--text-light);
+}
+
+.footer-description {
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+
+
+.footer-contact i {
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+}
+
+.footer-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.footer-subtitle {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: var(--text-light);
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+    padding-left: 5px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    color: var(--text-light);
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-5px);
+    color: white;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 0;
+    margin-top: 2rem;
+}
+
+.heart {
+    color: #e74c3c;
+    animation: heartbeat 1.5s infinite;
+}
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .navbar-nav {
+        margin-top: 1rem;
+    }
+
+    .nav-link-custom {
+        padding: 0.75rem 0 !important;
+    }
+
+    .btn-cuenta {
+        margin-top: 1rem;
+        width: 100%;
+    }
+}
+
+/* Dropdown Menu Styling */
+.dropdown-menu {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 0;
+    margin-top: 0.75rem;
+    min-width: 220px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.5rem;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.dropdown-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background-color: var(--primary-color);
+    opacity: 0.1;
+    transition: width 0.3s ease;
+}
+
+.dropdown-item:hover::before {
+    width: 100%;
+}
+
+.dropdown-item:hover {
+    background-color: transparent;
+    color: var(--primary-color);
+    padding-left: 2rem;
+}
+
+.dropdown-item:active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 1rem;
+    border-top: 1px solid rgba(230, 126, 34, 0.2);
+}
+
+/* Agregar iconos a los items del dropdown */
+.dropdown-item i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-item:hover i {
+    transform: translateX(3px);
+}
+
+/* Botón cuenta con dropdown activo */
+.dropdown.show .btn-cuenta {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(230, 126, 34, 0.3);
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .dropdown-menu {
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 0.5rem;
+    }
+    
+    .dropdown-menu::before {
+        display: none;
+    }
+}

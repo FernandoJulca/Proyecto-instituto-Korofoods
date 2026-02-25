@@ -1,0 +1,54 @@
+<div *ngIf="cargando" class="cargando">
+  <span class="material-icons spin">autorenew</span>
+  Cargando Dashboard...
+</div>
+
+<div class="contedor-dashboard">
+  <div
+    #grid
+    class="grid-stack"
+    [style.visibility]="cargando ? 'hidden' : 'visible'"
+  >
+    <!--
+      gs-w = columnas q ocupa
+      gs-h = filas q ocupa
+    -->
+    <div class="grid-stack-item" gs-w="4" gs-h="2">
+      <div class="grid-stack-item-content">
+        <app-grafico-tres *ngIf="graficosVisibles.tres"></app-grafico-tres>
+      </div>
+    </div>
+
+    <div class="grid-stack-item" gs-w="2" gs-h="2">
+      <div class="grid-stack-item-content">
+        <app-grafico-uno *ngIf="graficosVisibles.uno"></app-grafico-uno>
+      </div>
+    </div>
+
+    <div class="grid-stack-item" gs-w="2" gs-h="2">
+      <div class="grid-stack-item-content">
+        <app-grafico-seis *ngIf="graficosVisibles.seis"></app-grafico-seis>
+      </div>
+    </div>
+
+    <div class="grid-stack-item" gs-w="4" gs-h="2">
+      <div class="grid-stack-item-content">
+        <app-grafico-dos *ngIf="graficosVisibles.dos"></app-grafico-dos>
+      </div>
+    </div>
+
+    <div class="grid-stack-item" gs-w="2" gs-h="2">
+      <div class="grid-stack-item-content">
+        <app-grafico-cuatro
+          *ngIf="graficosVisibles.cuatro"
+        ></app-grafico-cuatro>
+      </div>
+    </div>
+
+    <div class="grid-stack-item" gs-w="2" gs-h="2">
+      <div class="grid-stack-item-content">
+        <app-grafico-cinco *ngIf="graficosVisibles.cinco"></app-grafico-cinco>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://koroFoods.com/usuario"
+           xmlns:tns="http://koroFoods.com/usuario"
+           elementFormDefault="qualified">
+
+    <!-- Tipos Complejos -->
+    <xs:complexType name="Usuario">
+        <xs:sequence>
+            <xs:element name="idUsuario" type="xs:int" minOccurs="0"/>
+            <xs:element name="nombres" type="xs:string"/>
+            <xs:element name="apePaterno" type="xs:string"/>
+            <xs:element name="apeMaterno" type="xs:string"/>
+            <xs:element name="correo" type="xs:string"/>
+            <xs:element name="clave" type="xs:string" minOccurs="0"/>
+            <xs:element name="tipoDoc" type="tns:TipoDocumentoSoap"/>
+            <xs:element name="nroDoc" type="xs:string"/>
+            <xs:element name="direccion" type="xs:string" minOccurs="0"/>
+            <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+            <xs:element name="idDistrito" type="xs:int" minOccurs="0"/>
+            <xs:element name="idRol" type="xs:int"/>
+            <xs:element name="nombreRol" type="xs:string" minOccurs="0"/>
+            <xs:element name="activo" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="fechaRegistro" type="xs:dateTime" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="TipoDocumentoSoap">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DNI"/>
+            <xs:enumeration value="PAS"/>
+            <xs:enumeration value="CDX"/>
+            <xs:enumeration value="CMP"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="Respuesta">
+        <xs:sequence>
+            <xs:element name="exitoso" type="xs:boolean"/>
+            <xs:element name="mensaje" type="xs:string"/>
+            <xs:element name="codigo" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- CREAR Usuario (Recepcionista o Mesero) -->
+    <xs:element name="crearUsuarioRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="nombres" type="xs:string"/>
+                <xs:element name="apePaterno" type="xs:string"/>
+                <xs:element name="apeMaterno" type="xs:string"/>
+                <xs:element name="correo" type="xs:string"/>
+                <xs:element name="clave" type="xs:string"/>
+                <xs:element name="tipoDoc" type="tns:TipoDocumentoSoap"/>
+                <xs:element name="nroDoc" type="xs:string"/>
+                <xs:element name="direccion" type="xs:string" minOccurs="0"/>
+                <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+                <xs:element name="idDistrito" type="xs:int" minOccurs="0"/>
+                <xs:element name="idRol" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="crearUsuarioResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="respuesta" type="tns:Respuesta"/>
+                <xs:element name="usuario" type="tns:Usuario" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- LISTAR Usuarios -->
+    <xs:element name="listarUsuariosRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="idRol" type="xs:int" minOccurs="0"/>
+                <xs:element name="activo" type="xs:boolean" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="listarUsuariosResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="usuarios" type="tns:Usuario" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- OBTENER Usuario por ID -->
+    <xs:element name="obtenerUsuarioRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="idUsuario" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="obtenerUsuarioResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="respuesta" type="tns:Respuesta"/>
+                <xs:element name="usuario" type="tns:Usuario" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- ACTUALIZAR Usuario -->
+    <xs:element name="actualizarUsuarioRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="idUsuario" type="xs:int"/>
+                <xs:element name="nombres" type="xs:string"/>
+                <xs:element name="apePaterno" type="xs:string"/>
+                <xs:element name="apeMaterno" type="xs:string"/>
+                <xs:element name="correo" type="xs:string"/>
+                <xs:element name="clave" type="xs:string" minOccurs="0"/>
+                <xs:element name="tipoDoc" type="tns:TipoDocumentoSoap"/>
+                <xs:element name="nroDoc" type="xs:string"/>
+                <xs:element name="direccion" type="xs:string" minOccurs="0"/>
+                <xs:element name="telefono" type="xs:string" minOccurs="0"/>
+                <xs:element name="idDistrito" type="xs:int" minOccurs="0"/>
+                <xs:element name="idRol" type="xs:int"/>
+                <xs:element name="activo" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="actualizarUsuarioResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="respuesta" type="tns:Respuesta"/>
+                <xs:element name="usuario" type="tns:Usuario" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- CAMBIAR Estado Usuario -->
+    <xs:element name="cambiarEstadoUsuarioRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="idUsuario" type="xs:int"/>
+                <xs:element name="activo" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="cambiarEstadoUsuarioResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="respuesta" type="tns:Respuesta"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

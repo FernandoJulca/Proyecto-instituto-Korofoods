@@ -1,0 +1,222 @@
+<div class="chat-window-container">
+  <!-- Empty State -->
+  <div *ngIf="!chat" class="empty-chat-state">
+    <svg
+      width="80"
+      height="80"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+    >
+      <path
+        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+      ></path>
+      <line x1="9" y1="10" x2="15" y2="10"></line>
+      <line x1="9" y1="14" x2="13" y2="14"></line>
+    </svg>
+    <h3>Selecciona una conversación</h3>
+    <p>Elige un cliente de la lista para comenzar a chatear</p>
+  </div>
+
+  <!-- Chat Window -->
+  <div *ngIf="chat" class="chat-window-content">
+    <!-- Header -->
+    <div class="chat-window-header">
+      <div class="contact-info">
+        <div class="contact-avatar">
+          <img [src]="getAvatarUrl(chat.imagen)" [alt]="getClientName()" />
+          <span class="status-indicator online"></span>
+        </div>
+        <div class="contact-details">
+          <h3>{{ getClientName() }}</h3>
+          <p class="status-text">
+            <span class="status-dot"></span>
+            En línea
+          </p>
+        </div>
+      </div>
+
+      <div class="chat-actions">
+        <button class="btn-icon" title="Información del cliente">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+        <button class="btn-icon" title="Archivar conversación">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="21 8 21 21 3 21 3 8"></polyline>
+            <rect x="1" y="3" width="22" height="5"></rect>
+            <line x1="10" y1="12" x2="14" y2="12"></line>
+          </svg>
+        </button>
+        <button class="btn-icon" title="Más opciones">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="1"></circle>
+            <circle cx="12" cy="5" r="1"></circle>
+            <circle cx="12" cy="19" r="1"></circle>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div #messagesContainer class="messages-container">
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>Cargando conversación...</p>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="!isLoading" class="messages-list">
+        <!-- Date Separator -->
+        <div class="date-separator">
+          <!--<span>Hoy, {{ new Date() | date: 'longDate' }}</span>-->
+        </div>
+
+        <!-- Message Bubbles -->
+        <div
+          *ngFor="let mensaje of mensajes"
+          class="message-wrapper"
+          [class.my-message]="isMyMessage(mensaje)"
+          [class.other-message]="!isMyMessage(mensaje)"
+        >
+          <div class="message-bubble">
+            <p class="message-text">{{ mensaje.contenido }}</p>
+            <div class="message-meta">
+              <span class="message-time">{{
+                formatMessageTime(mensaje.fechaMandado)
+              }}</span>
+              <svg
+                *ngIf="isMyMessage(mensaje)"
+                class="message-check"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-container">
+      <div class="input-wrapper">
+        <button class="btn-icon" title="Adjuntar archivo">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+            ></path>
+          </svg>
+        </button>
+
+        <button class="btn-icon" title="Emoji">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+            <line x1="9" y1="9" x2="9.01" y2="9"></line>
+            <line x1="15" y1="9" x2="15.01" y2="9"></line>
+          </svg>
+        </button>
+
+        <input
+          type="text"
+          placeholder="Escribe una respuesta..."
+          [(ngModel)]="newMessage"
+          (keypress)="onKeyPress($event)"
+          [disabled]="isSending"
+        />
+
+        <button
+          class="btn-send"
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim() || isSending"
+          title="Enviar mensaje"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Quick Responses (Respuestas rápidas) -->
+      <div class="quick-responses">
+        <button
+          class="quick-response-btn"
+          (click)="newMessage = '¡Hola! ¿En qué puedo ayudarte?'"
+        >
+          👋 Saludo
+        </button>
+        <button
+          class="quick-response-btn"
+          (click)="
+            newMessage = 'Gracias por tu mensaje. Te responderé en breve.'
+          "
+        >
+          ⏱️ En breve
+        </button>
+        <button
+          class="quick-response-btn"
+          (click)="
+            newMessage =
+              '¡Gracias por contactarnos! ¿Hay algo más en lo que pueda ayudarte?'
+          "
+        >
+          ✅ Finalizar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

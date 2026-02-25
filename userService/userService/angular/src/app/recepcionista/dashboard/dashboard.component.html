@@ -1,0 +1,172 @@
+<div class="dashboard-container">
+  <!-- Header del Dashboard -->
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h1 class="dashboard-title">Dashboard</h1>
+      <p class="dashboard-date">
+        <i class="fa-regular fa-calendar"></i>
+        {{ fechaFormateada }}
+      </p>
+    </div>
+    <div class="header-right">
+      <button
+        class="btn-refresh"
+        (click)="cargarDatosDashboard()"
+        [disabled]="loading"
+      >
+        <i class="fa-solid fa-rotate-right" [class.fa-spin]="loading"></i>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando información del dashboard...</p>
+    </div>
+  }
+
+  <!-- Estado de error -->
+  @if (error && !loading) {
+    <div class="error-state">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="cargarDatosDashboard()">
+        Intentar nuevamente
+      </button>
+    </div>
+  }
+
+  <!-- Contenido del Dashboard -->
+  @if (!loading && !error) {
+    <div class="dashboard-content">
+      <!-- Sección de Métricas -->
+      <section class="metrics-section">
+        <h2 class="section-title">Resumen del día</h2>
+        <div class="metrics-grid">
+          <div class="metric-card card-primary">
+            <div class="metric-icon bg-primary">
+              <i class="fa-solid fa-calendar-day"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-value">{{ counts.reservasHoy }}</span>
+              <span class="metric-label">Reservas para hoy</span>
+            </div>
+          </div>
+
+          <div class="metric-card card-success">
+            <div class="metric-icon bg-success">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-value">{{ counts.reservasAsistidas }}</span>
+              <span class="metric-label">Asistidas</span>
+            </div>
+          </div>
+
+          <div class="metric-card card-warning">
+            <div class="metric-icon bg-warning">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-value">{{ counts.reservasPendientes }}</span>
+              <span class="metric-label">Pendientes</span>
+            </div>
+          </div>
+
+          <div class="metric-card card-info">
+            <div class="metric-icon bg-info">
+              <i class="fa-solid fa-calendar-plus"></i>
+            </div>
+            <div class="metric-info">
+              <span class="metric-value">{{ counts.reservasTomorrow }}</span>
+              <span class="metric-label">Para mañana</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de Eventos del Día -->
+      <section class="events-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <i class="fa-regular fa-calendar-check"></i>
+            Eventos de hoy
+          </h2>
+          <span class="events-count">{{ eventosDelDia.length }} eventos</span>
+        </div>
+
+        @if (eventosDelDia.length === 0) {
+          <div class="empty-state">
+            <i class="fa-regular fa-calendar-xmark"></i>
+            <p>No hay eventos programados para hoy</p>
+          </div>
+        } @else {
+          <div class="events-grid">
+            @for (
+              evento of eventosDelDia;
+              track trackByEventoId($index, evento)
+            ) {
+              <div class="event-card">
+                <div class="event-header">
+                  <div class="event-icon">
+                    <span class="emoji-tematica">{{
+                      getEmojiTematica(evento.tematica)
+                    }}</span>
+                  </div>
+                  <div class="event-title">
+                    <h3>{{ evento.nombre }}</h3>
+                    <span class="event-tematica">{{ evento.tematica }}</span>
+                  </div>
+                </div>
+
+                <p class="event-descripcion">{{ evento.descripcion }}</p>
+
+                <div class="event-datetime">
+                  <div class="datetime-item">
+                    <i class="fa-regular fa-clock"></i>
+                    <span
+                      >{{ formatearHora(evento.fechaInicio) }} –
+                      {{ formatearHora(evento.fechaFin) }}</span
+                    >
+                  </div>
+                  <div class="datetime-item">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span>{{ evento.fechaInicio | date: "dd/MM/yyyy" }}</span>
+                  </div>
+                </div>
+
+                <div class="event-meta">
+                  <div class="meta-item">
+                    <i class="fa-regular fa-user"></i>
+                    <span>Capacidad: {{ evento.aforo }} personas</span>
+                  </div>
+
+                  <!-- Estado temporal del evento -->
+                  <div
+                    class="estado-badge"
+                    [class]="getEstadoEvento(evento).clase"
+                  >
+                    {{ getEstadoEvento(evento).label }}
+                  </div>
+                </div>
+
+                @if (evento.imagen) {
+                  <div class="event-footer">
+                    <img
+                      [src]="evento.imagen"
+                      [alt]="evento.nombre"
+                      class="event-image"
+                    />
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

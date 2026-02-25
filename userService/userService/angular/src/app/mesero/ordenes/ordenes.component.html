@@ -1,0 +1,127 @@
+<div class="ordenes-container">
+  <!-- Header con filtros y acciones -->
+  <div class="ordenes-header">
+    <div class="header-left">
+      <h2 class="section-title">Órdenes Activas</h2>
+      <span class="total-count">{{ pedidos.length }} órdenes</span>
+    </div>
+
+    <div class="header-right">
+      <div class="filter-tabs">
+        <button
+          *ngFor="let tab of filterTabs"
+          class="filter-tab"
+          [class.active]="selectedFilter === tab.value"
+          (click)="filterByStatus(tab.value)"
+        >
+          {{ tab.label }}
+          <span class="tab-count">{{ getCountByStatus(tab.value) }}</span>
+        </button>
+      </div>
+
+      <button
+        class="refresh-btn"
+        (click)="cargarPedidos()"
+        [disabled]="loading"
+      >
+        <span class="icon">🔄</span>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando órdenes...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Error al cargar órdenes</h3>
+    <p>{{ error }}</p>
+    <button class="retry-btn" (click)="cargarPedidos()">Reintentar</button>
+  </div>
+
+  <!-- Empty State -->
+  <div
+    *ngIf="!loading && !error && pedidosFiltrados.length === 0"
+    class="empty-state"
+  >
+    <div class="empty-icon">📋</div>
+    <h3>No hay órdenes</h3>
+    <p>No se encontraron órdenes con el filtro seleccionado</p>
+  </div>
+
+  <!-- Órdenes Grid -->
+  <div
+    *ngIf="!loading && !error && pedidosFiltrados.length > 0"
+    class="ordenes-grid"
+  >
+    <div
+      *ngFor="let pedido of pedidosFiltrados"
+      class="orden-card"
+      [class]="'status-' + pedido.estado.toLowerCase()"
+    >
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="orden-info">
+          <div class="orden-numero">
+            <span class="label">Orden #</span>
+            <span class="value">{{ pedido.idPedido }}</span>
+          </div>
+          <div class="mesa-numero">
+            <span class="mesa-icon">🪑</span>
+            <span class="mesa-text">Mesa {{ pedido.idMesa }}</span>
+          </div>
+        </div>
+        <div class="estado-badge" [ngClass]="getEstadoClass(pedido.estado)">
+          {{ getEstadoLabel(pedido.estado) }}
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+        <div class="info-row">
+          <div class="info-item">
+            <span class="info-icon">🕐</span>
+            <div class="info-content">
+              <span class="info-label">Hora</span>
+              <span class="info-value">{{ formatHora(pedido.fechaHora) }}</span>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <span class="info-icon">📅</span>
+            <div class="info-content">
+              <span class="info-label">Fecha</span>
+              <span class="info-value">{{
+                formatFecha(pedido.fechaHora)
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tiempo-transcurrido">
+          <span class="tiempo-icon">⏱️</span>
+          <span class="tiempo-text">{{
+            getTiempoTranscurrido(pedido.fechaHora)
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Card Footer -->
+      <div class="card-footer">
+        <div class="total-section">
+          <span class="total-label">Total</span>
+          <span class="total-amount">S/ {{ pedido.total.toFixed(2) }}</span>
+        </div>
+        <button class="btn-ver-detalle" (click)="verDetalle(pedido.idPedido)">
+          <span class="btn-icon">👁️</span>
+          Ver Detalle
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

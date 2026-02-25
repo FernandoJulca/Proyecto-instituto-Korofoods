@@ -1,0 +1,287 @@
+<div class="nueva-orden-container">
+  <!-- Progress Steps -->
+  <div class="steps-header">
+    <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+      <div class="step-circle">
+        <span *ngIf="currentStep <= 1">1</span>
+        <span *ngIf="currentStep > 1">✓</span>
+      </div>
+      <span class="step-label">Buscar Reserva</span>
+    </div>
+    <div class="step-line" [class.completed]="currentStep > 1"></div>
+    <div class="step-item" [class.active]="currentStep === 2">
+      <div class="step-circle">2</div>
+      <span class="step-label">Seleccionar Platos</span>
+    </div>
+  </div>
+
+  <!-- PASO 1: Buscar Reserva -->
+  <div *ngIf="currentStep === 1" class="step-content" @fadeIn>
+    <div class="search-section">
+      <h2 class="section-title">Buscar Reserva</h2>
+      <p class="section-subtitle">Ingresa el código de la reserva para comenzar la orden</p>
+
+      <div class="search-box">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Ingrese código de reserva..."
+            [(ngModel)]="reservaSearchId"
+            (keyup.enter)="buscarReserva()"
+            [disabled]="searching">
+          <button 
+            class="search-btn" 
+            (click)="buscarReserva()"
+            [disabled]="!reservaSearchId || searching">
+            {{ searching ? 'Buscando...' : 'Buscar' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="searching" class="loading-state">
+        <div class="spinner-small"></div>
+        <p>Buscando reserva...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="searchError" class="error-message">
+        <span class="error-icon">⚠️</span>
+        <span>{{ searchError }}</span>
+      </div>
+
+      <!-- Resultado de búsqueda -->
+      <div *ngIf="reservaEncontrada && !searching" class="reserva-card" @slideIn>
+        <div class="card-header-reserva">
+          <div class="reserva-badge">
+            <span class="badge-icon">✓</span>
+            <span>Reserva Encontrada</span>
+          </div>
+          <span class="reserva-id">#{{ reservaEncontrada.idReserva }}</span>
+        </div>
+
+        <div class="card-body-reserva">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-icon">👤</span>
+              <div class="info-content">
+                <span class="info-label">Cliente</span>
+                <span class="info-value">{{ reservaEncontrada.nombreCompletoUsuario }}</span>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <span class="info-icon">🪑</span>
+              <div class="info-content">
+                <span class="info-label">Mesa</span>
+                <span class="info-value">Mesa {{ reservaEncontrada.mesa }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer-reserva">
+          <button class="btn-continuar" (click)="continuarAPlatos()">
+            Continuar con Orden
+            <span class="btn-arrow">→</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- PASO 2: Seleccionar Platos -->
+  <div *ngIf="currentStep === 2" class="step-content" @fadeIn>
+    <div class="platos-section">
+      <!-- Header con info de reserva -->
+      <div class="orden-header">
+        <div class="header-info">
+          <h2 class="section-title">Nueva Orden</h2>
+          <div class="reserva-info-mini">
+            <span class="info-tag">
+              <strong>Cliente:</strong> {{ reservaEncontrada?.nombreCompletoUsuario }}
+            </span>
+            <span class="info-tag">
+              <strong>Mesa:</strong> {{ reservaEncontrada?.mesa }}
+            </span>
+          </div>
+        </div>
+        <button class="btn-volver" (click)="volverABusqueda()">
+          ← Volver a búsqueda
+        </button>
+      </div>
+
+      <div class="content-grid">
+        <!-- Lista de Platos Disponibles -->
+        <div class="platos-disponibles">
+          <div class="section-header">
+            <h3>Platos Disponibles</h3>
+            <div class="search-filter">
+              <input 
+                type="text" 
+                placeholder="Buscar plato..."
+                [(ngModel)]="filtroPlato"
+                class="filter-input">
+              <select [(ngModel)]="filtroTipo" class="filter-select">
+                <option value="">Todos los tipos</option>
+                <option *ngFor="let tipo of tiposPlato" [value]="tipo">{{ obtenerNombreTipo(tipo)  }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Loading Platos -->
+          <div *ngIf="loadingPlatos" class="loading-state">
+            <div class="spinner-small"></div>
+            <p>Cargando platos...</p>
+          </div>
+
+          <!-- Error Platos -->
+          <div *ngIf="errorPlatos" class="error-message">
+            <span class="error-icon">⚠️</span>
+            <span>{{ errorPlatos }}</span>
+          </div>
+
+          <!-- Grid de Platos -->
+        <div *ngIf="!loadingPlatos && !errorPlatos">
+  <div class="platos-grid">
+    <div 
+      *ngFor="let plato of platosFiltradosMetodo()" 
+      class="plato-card"
+      [class.selected]="isPlatoSeleccionado(plato.idPlato)">
+      <div class="plato-imagen">
+        <img [src]="plato.imagen" [alt]="plato.nombre" (error)="onImgError($event)"/>
+        <span class="tipo-badge">{{ obtenerNombreTipo(plato.tipoPlato) }}</span>
+      </div>
+      <div class="plato-info">
+        <h4 class="plato-nombre">{{ plato.nombre }}</h4>
+        <p class="plato-precio">S/ {{ plato.precio.toFixed(2) }}</p>
+      </div>
+      <div class="plato-actions">
+        <button 
+          class="btn-agregar"
+          (click)="agregarPlato(plato)"
+          *ngIf="!isPlatoSeleccionado(plato.idPlato)">
+          <span>+</span> Agregar
+        </button>
+        <div class="cantidad-control" *ngIf="isPlatoSeleccionado(plato.idPlato)">
+          <button class="btn-cantidad" (click)="decrementarCantidad(plato.idPlato)">-</button>
+          <input 
+            type="number" 
+            class="cantidad-input"
+            [value]="getCantidad(plato.idPlato)"
+            (change)="actualizarCantidad(plato.idPlato, $event)"
+            min="1">
+          <button class="btn-cantidad" (click)="incrementarCantidad(plato.idPlato)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Controles de paginación -->
+  <div class="pagination-container" *ngIf="totalPaginas > 1">
+    <button 
+      class="btn-pagination"
+      (click)="cambiarPagina(1)"
+      [disabled]="paginaActual === 1">
+      ‹‹
+    </button>
+    
+    <button 
+      class="btn-pagination"
+      (click)="cambiarPagina(paginaActual - 1)"
+      [disabled]="paginaActual === 1">
+      ‹
+    </button>
+
+    <button
+      *ngFor="let pagina of paginasVisibles"
+      class="btn-pagination"
+      [class.active]="pagina === paginaActual"
+      (click)="cambiarPagina(pagina)">
+      {{ pagina }}
+    </button>
+
+    <button 
+      class="btn-pagination"
+      (click)="cambiarPagina(paginaActual + 1)"
+      [disabled]="paginaActual === totalPaginas">
+      ›
+    </button>
+
+    <button 
+      class="btn-pagination"
+      (click)="cambiarPagina(totalPaginas)"
+      [disabled]="paginaActual === totalPaginas">
+      ››
+    </button>
+
+    <span class="pagination-info">
+      Página {{ paginaActual }} de {{ totalPaginas }}
+    </span>
+  </div>
+</div>
+        <!-- Resumen de Orden -->
+        <div class="orden-resumen">
+          <div class="resumen-header">
+            <h3>Resumen de Orden</h3>
+            <span class="items-count">{{ platosSeleccionados.length }} items</span>
+          </div>
+
+          <div class="resumen-body">
+            <!-- Empty State -->
+            <div *ngIf="platosSeleccionados.length === 0" class="empty-resumen">
+              <div class="empty-icon">🍽️</div>
+              <p>No hay platos seleccionados</p>
+              <span class="empty-hint">Selecciona platos del menú</span>
+            </div>
+
+            <!-- Lista de platos seleccionados -->
+            <div *ngIf="platosSeleccionados.length > 0" class="items-list">
+              <div *ngFor="let item of platosSeleccionados" class="item-selected">
+                <div class="item-info">
+                  <img [src]="item.plato.imagen" [alt]="item.plato.nombre" class="item-thumb" (error)="onImgError($event)">
+                  <div class="item-details">
+                    <span class="item-nombre">{{ item.plato.nombre }}</span>
+                    <span class="item-precio">S/ {{ item.plato.precio.toFixed(2) }}</span>
+                  </div>
+                </div>
+                <div class="item-cantidad">
+                  <span class="cantidad-text">x{{ item.cantidad }}</span>
+                  <button class="btn-remove" (click)="removerPlato(item.plato.idPlato)">
+                    🗑️
+                  </button>
+                </div>
+                <div class="item-subtotal">
+                  S/ {{ (item.plato.precio * item.cantidad).toFixed(2) }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="resumen-footer">
+            <div class="total-section">
+              <div class="subtotal-row">
+                <span>Subtotal</span>
+                <span>S/ {{ calcularSubtotal().toFixed(2) }}</span>
+              </div>
+              <div class="total-row">
+                <span>Total</span>
+                <span class="total-amount">S/ {{ calcularTotal().toFixed(2) }}</span>
+              </div>
+            </div>
+
+            <button 
+              class="btn-crear-orden"
+              [disabled]="platosSeleccionados.length === 0 || creandoOrden"
+              (click)="crearOrden()">
+              <span *ngIf="!creandoOrden">✓ Crear Orden</span>
+              <span *ngIf="creandoOrden">Creando...</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

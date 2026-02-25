@@ -1,0 +1,110 @@
+<!-- crudMesas/mesa-form/mesa-form.component.html -->
+
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">{{ isEditMode ? 'Editar Mesa' : 'Nueva Mesa' }}</h4>
+        </div>
+        <div class="card-body">
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+          </div>
+
+          <form [formGroup]="mesaForm" (ngSubmit)="onSubmit()">
+            <!-- Número de Mesa y Capacidad -->
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="numeroMesa" class="form-label">Número de Mesa <span class="text-danger">*</span></label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="numeroMesa" 
+                    formControlName="numeroMesa"
+                    [class.is-invalid]="numeroMesa?.invalid && numeroMesa?.touched">
+                  <div *ngIf="numeroMesa?.invalid && numeroMesa?.touched" class="invalid-feedback">
+                    <div *ngIf="numeroMesa?.errors?.['required']">El número de mesa es obligatorio</div>
+                    <div *ngIf="numeroMesa?.errors?.['min']">El número debe ser mayor a 0</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="capacidad" class="form-label">Capacidad (personas) <span class="text-danger">*</span></label>
+                  <input 
+                    type="number" 
+                    class="form-control" 
+                    id="capacidad" 
+                    formControlName="capacidad"
+                    [class.is-invalid]="capacidad?.invalid && capacidad?.touched">
+                  <div *ngIf="capacidad?.invalid && capacidad?.touched" class="invalid-feedback">
+                    <div *ngIf="capacidad?.errors?.['required']">La capacidad es obligatoria</div>
+                    <div *ngIf="capacidad?.errors?.['min']">La capacidad mínima es 1</div>
+                    <div *ngIf="capacidad?.errors?.['max']">La capacidad máxima es 20</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Zona -->
+            <div class="mb-3">
+              <label for="zona" class="form-label">Zona <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                id="zona" 
+                formControlName="zona"
+                [class.is-invalid]="zona?.invalid && zona?.touched">
+                <option value="">Seleccione una zona</option>
+                <option *ngFor="let z of zonas" [value]="z.value">
+                  {{ z.label }}
+                </option>
+              </select>
+              <div *ngIf="zona?.invalid && zona?.touched" class="invalid-feedback">
+                <div *ngIf="zona?.errors?.['required']">La zona es obligatoria</div>
+              </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="mb-3">
+              <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                id="estado" 
+                formControlName="estado"
+                [class.is-invalid]="estado?.invalid && estado?.touched">
+                <option *ngFor="let est of estados" [value]="est.value">
+                  {{ est.label }}
+                </option>
+              </select>
+              <div *ngIf="estado?.invalid && estado?.touched" class="invalid-feedback">
+                <div *ngIf="estado?.errors?.['required']">El estado es obligatorio</div>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2 justify-content-end">
+              <button 
+                type="button" 
+                class="btn btn-secondary" 
+                (click)="cancelar()"
+                [disabled]="loading">
+                Cancelar
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="loading || mesaForm.invalid">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

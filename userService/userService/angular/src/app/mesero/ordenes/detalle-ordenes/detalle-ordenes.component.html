@@ -1,0 +1,320 @@
+<div class="mesero-container">
+  <button class="btn-volver" (click)="volver()">
+    <i class="fas fa-arrow-left"></i> Volver a Pedidos
+  </button>
+
+  <div class="header">
+    <h1><i class="fas fa-utensils"></i> Mesero</h1>
+    <p class="pedido-numero">Pedido #{{ idPedido }}</p>
+    <div
+      class="connection-status"
+      [ngClass]="wsConnected ? 'connected' : 'disconnected'"
+    >
+      <span class="status-icon">
+        <i
+          [class]="wsConnected ? 'fas fa-check-circle' : 'fas fa-times-circle'"
+        ></i>
+      </span>
+      <span>{{ wsConnected ? "Conectado" : "Desconectado" }}</span>
+    </div>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    <span><i class="fas fa-exclamation-triangle"></i> {{ error }}</span>
+    <button (click)="error = null"><i class="fas fa-times"></i></button>
+  </div>
+
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
+
+  <div class="main-content" *ngIf="!loading && idPedido">
+    <div class="menu-card">
+      <div class="card-header-green">
+        <h2><i class="fas fa-book-open"></i> Menú</h2>
+      </div>
+
+      <div class="cliente-info" *ngIf="cliente">
+        <div class="info-row">
+          <span class="label"><i class="fas fa-user"></i> Cliente:</span>
+          <span class="value">
+            {{ cliente.nombres }} {{ cliente.apePaterno }}
+            {{ cliente.apeMaterno }}
+          </span>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box">
+            <span class="stat-label">Platos Entregados:</span>
+            <span class="stat-value">{{ cliente.entregados }}</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Platos Pedidos:</span>
+            <span class="stat-value">{{ cliente.pedidos }}</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Platos Cancelados:</span>
+            <span class="stat-value">{{ cliente.cancelados }}</span>
+          </div>
+          <div class="stat-box">
+            <button class="btn-pagar" (click)="procederAlPago()">
+              <i class="fas fa-wallet"></i> Proceder al Pago
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="platos-section">
+      <h2><i class="fas fa-pizza-slice"></i> Platos</h2>
+
+      <div class="platos-grid">
+        <div
+          *ngFor="let detalle of detalles"
+          class="plato-card"
+          [ngClass]="{
+            'plato-pendiente': detalle.estado === 'PED',
+            'plato-entregado': detalle.estado === 'ENT',
+            'plato-cancelado': detalle.estado === 'CAN',
+          }"
+        >
+          <div class="plato-imagen">
+            <img [src]="detalle.imagen" [alt]="detalle.nombre" />
+            <span
+              class="estado-badge"
+              [ngClass]="getEstadoClase(detalle.estado)"
+            >
+              {{ getEstadoTexto(detalle.estado) }}
+            </span>
+          </div>
+
+          <div class="plato-info">
+            <h3>{{ detalle.nombre }}</h3>
+            <div class="plato-detalles">
+              <span class="cantidad">
+                <i class="fas fa-hashtag"></i> Cantidad: {{ detalle.cantidad }}
+              </span>
+              <span class="precio">
+                S/ {{ detalle.subTotal | number: "1.2-2" }}
+              </span>
+            </div>
+
+            <button
+              *ngIf="detalle.estado === 'PED'"
+              class="btn-entregar"
+              (click)="entregarPlato(detalle.idDetalle)"
+            >
+              <i class="fas fa-check-circle"></i> Entregar
+            </button>
+
+            <button
+              *ngIf="detalle.estado === 'ENT'"
+              class="btn-entregado"
+              disabled
+            >
+              <i class="fas fa-check"></i> Entregado
+            </button>
+
+            <button
+              *ngIf="detalle.estado === 'CAN'"
+              class="btn-cancelado"
+              disabled
+            >
+              <i class="fas fa-times"></i> Cancelado
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="detalles.length === 0" class="no-platos">
+          <p><i class="fas fa-inbox"></i> No hay platos en este pedido</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="resumen-section" *ngIf="detalles.length > 0">
+      <div class="resumen-card">
+        <h3><i class="fas fa-chart-pie"></i> Resumen del Pedido</h3>
+        <div class="resumen-stats">
+          <div class="resumen-item">
+            <span class="resumen-label">
+              <i class="fas fa-clock"></i> Pendientes:
+            </span>
+            <span class="resumen-value">{{ platosPendientes.length }}</span>
+          </div>
+          <div class="resumen-item">
+            <span class="resumen-label">
+              <i class="fas fa-check-circle"></i> Entregados:
+            </span>
+            <span class="resumen-value">{{ platosEntregados.length }}</span>
+          </div>
+          <div class="resumen-item">
+            <span class="resumen-label">
+              <i class="fas fa-times-circle"></i> Cancelados:
+            </span>
+            <span class="resumen-value">{{ platosCancelados.length }}</span>
+          </div>
+          <div class="resumen-item total">
+            <span class="resumen-label">
+              <i class="fas fa-dollar-sign"></i> Total:
+            </span>
+            <span class="resumen-value-total">
+              S/ {{ calcularTotal() | number: "1.2-2" }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-section">
+      <div class="menu-header">
+        <div>
+          <h2>🍽️ Menú</h2>
+          <p class="menu-subtitle">
+            Selecciona platos para agregar a tu pedido
+          </p>
+        </div>
+        <div class="loading-platos" *ngIf="loadingPlatos">
+          <div class="spinner-small"></div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filtros-container">
+        <div class="filtro-busqueda">
+          <input
+            type="text"
+            placeholder="🔍 Buscar plato..."
+            [(ngModel)]="filtroNombre"
+            (input)="aplicarFiltros()"
+            class="filtro-input"
+          />
+        </div>
+
+        <div class="filtro-tipo">
+          <select
+            [(ngModel)]="filtroTipo"
+            (change)="aplicarFiltros()"
+            class="filtro-select"
+          >
+            <option *ngFor="let tipo of tiposPlato" [value]="tipo.value">
+              {{ tipo.label }}
+            </option>
+          </select>
+        </div>
+
+        <button class="btn-limpiar" (click)="limpiarFiltros()">
+          🔄 Limpiar
+        </button>
+
+        <div class="resultados-info">
+          <span>{{ platosFiltrados.length }} plato(s)</span>
+        </div>
+      </div>
+
+      <!-- Grid de platos -->
+      <div class="platos-grid">
+        <div *ngFor="let plato of platosFiltrados" class="plato-card">
+          <div class="plato-imagen">
+            <img [src]="plato.imagen" [alt]="plato.nombre" />
+            <span class="plato-tipo-badge">{{
+              getTipoPlatoLabel(plato.tipoPlato)
+            }}</span>
+          </div>
+          <div class="plato-info">
+            <h3>{{ plato.nombre }}</h3>
+
+            <!-- Etiquetas -->
+            <div
+              class="etiquetas"
+              *ngIf="plato.etiquetas && plato.etiquetas.length > 0"
+            >
+              <span *ngFor="let etiqueta of plato.etiquetas" class="etiqueta">
+                {{ etiqueta.nombre }}
+              </span>
+            </div>
+
+            <p class="plato-precio">S/ {{ plato.precio | number: "1.2-2" }}</p>
+
+            <div class="cantidad-control">
+              <button
+                class="btn-cantidad"
+                (click)="decrementarCantidad(plato.idPlato)"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                [value]="getCantidad(plato.idPlato)"
+                min="1"
+                readonly
+                class="cantidad-input"
+              />
+              <button
+                class="btn-cantidad"
+                (click)="incrementarCantidad(plato.idPlato)"
+              >
+                +
+              </button>
+            </div>
+
+            <button class="btn-agregar" (click)="agregarPlato(plato.idPlato)">
+              ➕ Agregar
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="platosFiltrados.length === 0" class="no-platos">
+          <p>No se encontraron platos</p>
+          <button class="btn-limpiar" (click)="limpiarFiltros()">
+            🔄 Mostrar todos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Pago Mesero -->
+<div class="modal-overlay" *ngIf="mostrarModalPago">
+  <div class="modal-pago">
+    <h3>Resumen del Pedido</h3>
+
+    <div class="pago-datos" *ngIf="datosPago">
+      <div class="pago-row">
+        <span>Cliente:</span>
+        <strong>{{ datosPago.nombreCliente }}</strong>
+      </div>
+      <div class="pago-row">
+        <span>Total platos:</span>
+        <strong>{{ datosPago.totalPlatos }}</strong>
+      </div>
+      <div class="pago-row total">
+        <span>Total a pagar:</span>
+        <strong>S/ {{ datosPago.totalPagar | number: "1.2-2" }}</strong>
+      </div>
+    </div>
+
+    <!-- Método que eligió el cliente -->
+    <div class="metodo-elegido" *ngIf="metodoPagoCliente">
+      <p>Método elegido por el cliente:</p>
+      <span class="badge-metodo">{{ metodoPagoCliente }}</span>
+    </div>
+    <div class="esperando-metodo" *ngIf="!metodoPagoCliente">
+      <div class="spinner-small"></div>
+      <p>Esperando que el cliente elija el método de pago...</p>
+    </div>
+
+    <button
+      class="btn-confirmar-pago"
+      [disabled]="!metodoPagoCliente"
+      (click)="confirmarPago()"
+    >
+      Confirmar Pago
+    </button>
+
+    <button class="btn-cancelar-modal" (click)="mostrarModalPago = false">
+      Cancelar
+    </button>
+  </div>
+</div>

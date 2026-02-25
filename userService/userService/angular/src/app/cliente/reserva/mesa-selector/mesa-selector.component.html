@@ -1,0 +1,177 @@
+<div class="mesa-selector-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p class="loading-text">Cargando mesas disponibles...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && mesas.length === 0" class="empty-state">
+    <div class="empty-icon">🪑</div>
+    <h3 class="empty-title">No hay mesas disponibles</h3>
+    <p class="empty-message">
+      {{ mensaje || 'Lo sentimos, no encontramos mesas que coincidan con tus criterios de búsqueda.' }}
+    </p>
+    <div class="empty-suggestions">
+      <p class="suggestion-title">Sugerencias:</p>
+      <ul class="suggestion-list">
+        <li>Intenta con un número diferente de personas</li>
+        <li>Selecciona otra zona del restaurante</li>
+        <li>Elige una fecha u horario diferente</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Mesas Grid - Vista Normal -->
+  <div *ngIf="!isLoading && mesas.length > 0 && tipoVista === 'normal'" class="mesas-section">
+    <div class="section-header">
+      <h2 class="section-title">Mesas Disponibles</h2>
+      <p class="section-subtitle">{{ mensaje }}</p>
+      <div class="results-count">
+        <span class="count-number">{{ mesas.length }}</span>
+        <span class="count-label">{{ mesas.length === 1 ? 'mesa encontrada' : 'mesas encontradas' }}</span>
+      </div>
+    </div>
+
+    <div class="mesas-grid">
+      <div
+        *ngFor="let mesa of mesas"
+        class="mesa-card"
+        [class.selected]="mesaActiva === getIdMesa(mesa)"
+        [class.ocupada]="getMesaEstado(mesa) === 'OCUPADA'"
+        [class.libre]="getMesaEstado(mesa) === 'LIBRE'"
+        (click)="seleccionarMesa(mesa)"
+      >
+        <div class="mesa-header">
+          <div class="mesa-zona" [style.background-color]="getZonaColor(getZona(mesa))">
+            {{ getZona(mesa) }}
+          </div>
+          <div class="mesa-estado" [ngClass]="getEstadoClass(getMesaEstado(mesa))">
+            {{ getMesaEstado(mesa) }}
+          </div>
+        </div>
+
+        <div class="mesa-body">
+          <div class="mesa-icon">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="20" y="30" width="60" height="40" rx="5" fill="currentColor" opacity="0.2"/>
+              <circle cx="25" cy="75" r="3" fill="currentColor"/>
+              <circle cx="75" cy="75" r="3" fill="currentColor"/>
+              <circle cx="25" cy="25" r="3" fill="currentColor"/>
+              <circle cx="75" cy="25" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+
+          <div class="mesa-numero">Mesa #{{ getNumeroMesa(mesa) }}</div>
+          
+          <div class="mesa-info">
+            <div class="info-item">
+              <span class="info-icon">👥</span>
+              <span class="info-value">{{ getCapacidad(mesa) }} personas</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mesa-footer">
+          <button 
+            class="btn-seleccionar"
+            [disabled]="getMesaEstado(mesa) !== 'LIBRE' && getMesaEstado(mesa) !== 'DISPONIBLE'"
+          >
+            {{ mesaActiva === getIdMesa(mesa) ? '✓ Seleccionada' : 'Seleccionar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mesas Grid - Vista Eventos -->
+  <div *ngIf="!isLoading && mesas.length > 0 && tipoVista === 'evento'" class="mesas-section eventos">
+    <div class="section-header">
+      <h2 class="section-title">Mesas en Eventos</h2>
+      <p class="section-subtitle">{{ mensaje }}</p>
+      <div class="results-count">
+        <span class="count-number">{{ mesas.length }}</span>
+        <span class="count-label">{{ mesas.length === 1 ? 'mesa disponible' : 'mesas disponibles' }}</span>
+      </div>
+    </div>
+
+    <div class="eventos-grid">
+      <div
+        *ngFor="let mesa of mesas"
+        class="evento-card"
+        [class.selected]="mesaActiva === getIdMesa(mesa)"
+        (click)="seleccionarMesa(mesa)"
+      >
+        <div class="evento-image" *ngIf="isEventoConMesaDto(mesa)">
+          <img 
+            [src]="mesa.imagen || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=250&fit=crop'" 
+            [alt]="mesa.nombre"
+          />
+          <div class="evento-badge">
+            <span class="badge-icon">🎉</span>
+            <span>Evento Especial</span>
+          </div>
+        </div>
+
+        <div class="evento-content">
+          <div class="evento-header" *ngIf="isEventoConMesaDto(mesa)">
+            <h3 class="evento-nombre">{{ mesa.nombre }}</h3>
+            <span class="evento-tematica">{{ mesa.tematica }}</span>
+          </div>
+
+          <p class="evento-descripcion" *ngIf="isEventoConMesaDto(mesa)">
+            {{ mesa.descripcion }}
+          </p>
+
+          <div class="evento-detalles">
+            <div class="detalle-item" *ngIf="isEventoConMesaDto(mesa)">
+              <span class="detalle-icon">📅</span>
+              <div class="detalle-info">
+                <span class="detalle-label">Inicio</span>
+                <span class="detalle-value">{{ formatearFecha(mesa.fechaInicio) }}</span>
+              </div>
+            </div>
+
+            <div class="detalle-item" *ngIf="isEventoConMesaDto(mesa)">
+              <span class="detalle-icon">⏰</span>
+              <div class="detalle-info">
+                <span class="detalle-label">Fin</span>
+                <span class="detalle-value">{{ formatearFecha(mesa.fechaFin) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mesa-info-evento">
+            <div class="mesa-detalle">
+              <div class="mesa-zona-badge" [style.background-color]="getZonaColor(getZona(mesa))">
+                {{ getZona(mesa) }}
+              </div>
+              <span class="mesa-numero-small">Mesa #{{ getNumeroMesa(mesa) }}</span>
+            </div>
+            
+            <div class="capacidad-info">
+              <span class="capacidad-icon">👥</span>
+              <span class="capacidad-text">{{ getCapacidad(mesa) }} personas</span>
+            </div>
+          </div>
+
+          <button class="btn-reservar-evento">
+            {{ mesaActiva === getIdMesa(mesa) ? '✓ Mesa Seleccionada' : 'Reservar Mesa' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leyenda de Estados -->
+  <div *ngIf="!isLoading && mesas.length > 0 && tipoVista === 'normal'" class="estados-leyenda">
+    <div class="leyenda-item">
+      <span class="leyenda-color estado-libre"></span>
+      <span class="leyenda-text">Disponible</span>
+    </div>
+    <div class="leyenda-item">
+      <span class="leyenda-color estado-ocupada"></span>
+      <span class="leyenda-text">Ocupada</span>
+    </div>
+  </div>
+</div>

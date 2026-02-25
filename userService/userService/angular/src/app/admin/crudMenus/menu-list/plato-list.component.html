@@ -1,0 +1,109 @@
+<!-- crudMenus/plato-list/plato-list.component.html -->
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Gestión de Menú</h3>
+    <a routerLink="/admin/menus/nuevo" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Nuevo Plato
+    </a>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Tabla de platos -->
+  <div *ngIf="!loading" class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Imagen</th>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Precio</th>
+              <th>Stock</th>
+              <th>Etiquetas</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let plato of platos">
+              <td>{{ plato.idPlato }}</td>
+              <td>
+                <img 
+                  *ngIf="plato.imagen" 
+                  [src]="plato.imagen" 
+                  alt="{{ plato.nombre }}"
+                  class="plato-imagen">
+                <span *ngIf="!plato.imagen" class="text-muted">Sin imagen</span>
+              </td>
+              <td>{{ plato.nombre }}</td>
+              <td>
+                <span [class]="'badge ' + getBadgeClass(plato.tipoPlato)">
+                  {{ plato.tipoPlayoDescripcion }}
+                </span>
+              </td>
+              <td>{{ formatearPrecio(plato.precio) }}</td>
+              <td>
+                <span [class]="plato.stock > 10 ? 'text-success' : 'text-danger'">
+                  {{ plato.stock }}
+                </span>
+              </td>
+              <td>
+                <div class="etiquetas-container">
+                  <span 
+                    *ngFor="let etiqueta of plato.etiquetas" 
+                    class="badge bg-secondary me-1">
+                    {{ etiqueta.nombre }}
+                  </span>
+                  <span *ngIf="plato.etiquetas.length === 0" class="text-muted">
+                    Sin etiquetas
+                  </span>
+                </div>
+              </td>
+              <td>
+                <span [class]="plato.activo ? 'badge bg-success' : 'badge bg-secondary'">
+                  {{ plato.activo ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a 
+                    [routerLink]="['/admin/menus/editar', plato.idPlato]" 
+                    class="btn btn-sm btn-warning"
+                    title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button 
+                    (click)="confirmarEliminar(plato)" 
+                    class="btn btn-sm btn-danger"
+                    title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="platos.length === 0">
+              <td colspan="9" class="text-center text-muted">
+                No hay platos registrados
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

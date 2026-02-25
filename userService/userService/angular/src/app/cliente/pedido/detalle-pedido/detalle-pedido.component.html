@@ -1,0 +1,401 @@
+<div class="pedido-container">
+  <!-- Botón volver -->
+  <button class="btn-volver" (click)="volver()">← Volver a Mis Pedidos</button>
+
+  <div class="pedido-pagado-banner" *ngIf="estadoPedido === 'PA'">
+    ✅ Este pedido ya fue pagado
+  </div>
+  <!-- Header con estado de conexión -->
+  <div class="header">
+    <h1>🍽️ Detalle del Pedido #{{ idPedido }}</h1>
+
+    <button class="animated-button" onclick="info.showModal()">
+      <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+        ></path>
+      </svg>
+      <span class="text">Informacion de los platos</span>
+      <span class="circle"></span>
+      <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"
+        ></path>
+      </svg>
+    </button>
+
+    <dialog id="info" closedBy="any">
+      <h6>La empresa KoroFoods cumple</h6>
+      <p>
+        Con el
+        <a
+          href="https://lpderecho.pe/codigo-de-proteccion-y-defensa-del-consumidor-ley-29571/?utm_source=chatgpt.com"
+          target="_blank"
+          >Código de Protección y Defensa del Consumidor (Ley N° 29571).</a
+        >
+        Las imágenes son <strong style="color: red">referenciales</strong> y no
+        reemplazan la realidad del producto.
+      </p>
+      <button (click)="cerrarDialog()" class="cerrar">Cerrar</button>
+    </dialog>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="error-message" *ngIf="error">
+    <span>⚠️ {{ error }}</span>
+    <button (click)="error = null">✖</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando...</p>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="main-content" *ngIf="!loading && idPedido">
+    <!-- Info del mesero -->
+    <div class="mesero-card" *ngIf="mesero">
+      <div class="card-header">
+        <h2>👨‍🍳 Tu Mesero</h2>
+      </div>
+      <div class="mesero-info">
+        <div class="mesero-avatar">
+          <span
+            >{{ mesero.nombres.charAt(0)
+            }}{{ mesero.apePaterno.charAt(0) }}</span
+          >
+        </div>
+        <div class="mesero-detalles">
+          <h3>
+            {{ mesero.nombres }} {{ mesero.apePaterno }} {{ mesero.apeMaterno }}
+          </h3>
+          <div class="mesero-stats">
+            <div class="stat">
+              <span class="stat-label">Pedidos Totales:</span>
+              <span class="stat-value">{{ mesero.pedidosTotales }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Clientes Atendidos:</span>
+              <span class="stat-value">{{ mesero.clientesTotales }}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">Completados:</span>
+              <span class="stat-value">{{ mesero.pedidosCompletados }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menú - Seleccionar platos -->
+    <div class="menu-section">
+      <div class="menu-header">
+        <div>
+          <h2>🍽️ Menú</h2>
+          <p class="menu-subtitle">
+            Selecciona platos para agregar a tu pedido
+          </p>
+        </div>
+        <div class="loading-platos" *ngIf="loadingPlatos">
+          <div class="spinner-small"></div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="filtros-container">
+        <div class="filtro-busqueda">
+          <input
+            type="text"
+            placeholder="🔍 Buscar plato..."
+            [(ngModel)]="filtroNombre"
+            (input)="aplicarFiltros()"
+            class="filtro-input"
+          />
+        </div>
+
+        <div class="filtro-tipo">
+          <select
+            [(ngModel)]="filtroTipo"
+            (change)="aplicarFiltros()"
+            class="filtro-select"
+          >
+            <option *ngFor="let tipo of tiposPlato" [value]="tipo.value">
+              {{ tipo.label }}
+            </option>
+          </select>
+        </div>
+
+        <button class="btn-limpiar" (click)="limpiarFiltros()">
+          🔄 Limpiar
+        </button>
+
+        <div class="resultados-info">
+          <span>{{ platosFiltrados.length }} plato(s)</span>
+        </div>
+      </div>
+
+      <!-- Grid de platos -->
+      <div class="platos-grid">
+        <div *ngFor="let plato of platosFiltrados" class="plato-card">
+          <div class="plato-imagen">
+            <img [src]="plato.imagen" [alt]="plato.nombre" />
+            <span class="plato-tipo-badge">{{
+              getTipoPlatoLabel(plato.tipoPlato)
+            }}</span>
+          </div>
+          <div class="plato-info">
+            <h3>{{ plato.nombre }}</h3>
+
+            <!-- Etiquetas -->
+            <div
+              class="etiquetas"
+              *ngIf="plato.etiquetas && plato.etiquetas.length > 0"
+            >
+              <span *ngFor="let etiqueta of plato.etiquetas" class="etiqueta">
+                {{ etiqueta.nombre }}
+              </span>
+            </div>
+
+            <p class="plato-precio">S/ {{ plato.precio | number: "1.2-2" }}</p>
+
+            <div class="cantidad-control">
+              <button
+                class="btn-cantidad"
+                (click)="decrementarCantidad(plato.idPlato)"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                [value]="getCantidad(plato.idPlato)"
+                min="1"
+                readonly
+                class="cantidad-input"
+              />
+              <button
+                class="btn-cantidad"
+                (click)="incrementarCantidad(plato.idPlato)"
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              class="btn-agregar"
+              (click)="agregarPlato(plato.idPlato)"
+              [disabled]="estadoPedido === 'PA'"
+              [ngClass]="{ 'btn-agregar-disabled': estadoPedido === 'PA' }"
+            >
+              ➕ Agregar
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="platosFiltrados.length === 0" class="no-platos">
+          <p>No se encontraron platos</p>
+          <button class="btn-limpiar" (click)="limpiarFiltros()">
+            🔄 Mostrar todos
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalle del pedido actual -->
+    <div class="detalle-pedido-section">
+      <div class="section-header">
+        <h2>📦 Detalle de tu Pedido #{{ idPedido }}</h2>
+      </div>
+
+      <div class="detalles-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Plato</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Subtotal</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let detalle of detalles">
+              <td>
+                <img
+                  [src]="detalle.imagen"
+                  [alt]="detalle.nombre"
+                  class="detalle-imagen"
+                />
+              </td>
+              <td>
+                <strong>{{ detalle.nombre }}</strong>
+              </td>
+              <td>S/ {{ detalle.precioUnitario | number: "1.2-2" }}</td>
+              <td class="cantidad-cell">
+                <div class="cantidad-badge">{{ detalle.cantidad }}</div>
+              </td>
+              <td class="subtotal-cell">
+                <strong>S/ {{ detalle.subTotal | number: "1.2-2" }}</strong>
+              </td>
+              <td>
+                <span
+                  class="estado-badge"
+                  [ngClass]="getEstadoClase(detalle.estado)"
+                >
+                  {{ getEstadoTexto(detalle.estado) }}
+                </span>
+              </td>
+              <td>
+                <button
+                  *ngIf="detalle.estado === 'PED'"
+                  class="btn-cancelar"
+                  (click)="cancelarPlato(detalle.idDetalle)"
+                  [disabled]="estadoPedido === 'PA'"
+                  [ngClass]="{ 'btn-agregar-disabled': estadoPedido === 'PA' }"
+                >
+                  ❌ Cancelar
+                </button>
+                <span *ngIf="detalle.estado !== 'PED'" class="no-action"
+                  >-</span
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="detalles.length === 0" class="no-detalles">
+          <p>No hay platos en este pedido</p>
+          <p class="subtitle">Selecciona platos del menú para agregar</p>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="total-section" *ngIf="detalles.length > 0">
+        <div class="total-row">
+          <span class="total-label">Total:</span>
+          <span class="total-value"
+            >S/ {{ calcularTotal() | number: "1.2-2" }}</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Método de Pago Cliente -->
+<div class="modal-overlay" *ngIf="mostrarModalMetodo">
+  <div class="modal-metodo">
+    <h3>Elige tu método de pago</h3>
+
+    <!-- Selector de métodos -->
+    <div class="metodos-grid">
+      <button
+        class="metodo-btn"
+        [class.activo]="metodoSeleccionado === 'TARJETA'"
+        (click)="elegirMetodo('TARJETA')"
+      >
+        <span class="metodo-icono">💳</span>
+        Tarjeta
+      </button>
+      <button
+        class="metodo-btn"
+        [class.activo]="metodoSeleccionado === 'YAPE'"
+        (click)="elegirMetodo('YAPE')"
+      >
+        <span class="metodo-icono yape">Y</span>
+        Yape
+      </button>
+      <button
+        class="metodo-btn"
+        [class.activo]="metodoSeleccionado === 'PLIN'"
+        (click)="elegirMetodo('PLIN')"
+      >
+        <span class="metodo-icono plin">P</span>
+        Plin
+      </button>
+      <button
+        class="metodo-btn"
+        [class.activo]="metodoSeleccionado === 'EFECTIVO'"
+        (click)="elegirMetodo('EFECTIVO')"
+      >
+        <span class="metodo-icono">💵</span>
+        Efectivo
+      </button>
+    </div>
+
+    <!-- ========== YAPE ========== -->
+    <div class="payment-form" *ngIf="metodoSeleccionado === 'YAPE'">
+      <div *ngIf="!imagenPreview">
+        <h4 class="payment-form-title">Escanea el código QR con Yape</h4>
+        <div class="qr-container">
+          <img [src]="qrYapeUrl" alt="QR Yape" class="qr-code" />
+          <p class="qr-instructions">
+            Abre tu app de Yape y escanea el código para pagar
+            <strong>S/ {{ datosPago?.totalPagar | number: "1.2-2" }}</strong>
+          </p>
+          <div class="yape-badge">
+            <span class="yape-icon">Y</span>
+            <span>Pago mediante Yape</span>
+          </div>
+        </div>
+        <div class="alert alert-info mt-3">
+          <h6>Instrucciones:</h6>
+          <ol class="mb-0">
+            <li>Abre tu app de Yape</li>
+            <li>Escanea este código QR</li>
+            <li>
+              Ingresa el monto:
+              <strong>S/ {{ datosPago?.totalPagar | number: "1.2-2" }}</strong>
+            </li>
+            <li>Completa el pago</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PLIN ========== -->
+    <div class="payment-form" *ngIf="metodoSeleccionado === 'PLIN'">
+      <div *ngIf="!imagenPreview">
+        <h4 class="payment-form-title">Escanea el código QR con Plin</h4>
+        <div class="qr-container">
+          <img [src]="qrPlinUrl" alt="QR Plin" class="qr-code" />
+          <p class="qr-instructions">
+            Abre tu app de Plin y escanea el código para pagar
+            <strong>S/ {{ datosPago?.totalPagar | number: "1.2-2" }}</strong>
+          </p>
+          <div class="plin-badge">
+            <span class="plin-icon">P</span>
+            <span>Pago mediante Plin</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== TARJETA ========== -->
+    <div class="payment-form" *ngIf="metodoSeleccionado === 'TARJETA'">
+      <h4 class="payment-form-title">Datos de la tarjeta</h4>
+      <p class="total-pagar">
+        Total: <strong>S/ {{ datosPago?.totalPagar | number: "1.2-2" }}</strong>
+      </p>
+      <p class="info-tarjeta">El mesero procesará el pago con tu tarjeta.</p>
+    </div>
+
+    <!-- ========== EFECTIVO ========== -->
+    <div class="payment-form" *ngIf="metodoSeleccionado === 'EFECTIVO'">
+      <h4 class="payment-form-title">Pago en efectivo</h4>
+      <p class="total-pagar">
+        Prepara:
+        <strong>S/ {{ datosPago?.totalPagar | number: "1.2-2" }}</strong>
+      </p>
+      <p class="info-tarjeta">Entrega el efectivo al mesero.</p>
+    </div>
+
+    <!-- Esperando confirmación -->
+    <p class="esperando" *ngIf="metodoSeleccionado">
+      ✅ Elegiste <strong>{{ metodoSeleccionado }}</strong> — esperando
+      confirmación del mesero...
+    </p>
+  </div>
+</div>

@@ -1,0 +1,213 @@
+<div class="perfil-page">
+
+  <!-- ===== HERO ===== -->
+  <section class="perfil-hero">
+    <div class="hero-bg"></div>
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="hero-content">
+      <span class="hero-tag">KoroFood</span>
+      <h1>Mi Perfil</h1>
+      <p>Gestiona tu información personal</p>
+    </div>
+  </section>
+
+  <!-- ===== LOADING ===== -->
+  <div class="state-container" *ngIf="isLoading">
+    <div class="loader">
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+    </div>
+    <p>Cargando perfil...</p>
+  </div>
+
+  <!-- ===== ERROR ===== -->
+  <div class="state-container error" *ngIf="error && !isLoading">
+    <div class="error-icon">⚠</div>
+    <p>{{ error }}</p>
+    <button class="btn-retry" (click)="cargarPerfil()">Reintentar</button>
+  </div>
+
+  <!-- ===== CONTENIDO PRINCIPAL ===== -->
+  <main class="perfil-main" *ngIf="datos && !isLoading">
+
+    <!-- CARD SUPERIOR: Avatar + nombre + info clave -->
+    <div class="profile-header-card">
+      <div class="avatar-section">
+        <div class="avatar-ring">
+          <div class="avatar-img" *ngIf="datos.imagen">
+            <img [src]="datos.imagen" alt="Foto de perfil" />
+          </div>
+          <div class="avatar-initials" *ngIf="!datos.imagen">
+            {{ getInitials() }}
+          </div>
+        </div>
+        <div class="avatar-status">
+          <span class="status-dot"></span>
+          Activo
+        </div>
+      </div>
+
+      <div class="header-info">
+        <div class="header-top">
+          <div>
+            <h2 class="full-name">{{ datos.nombres }} {{ datos.apePaterno }} {{ datos.apeMaterno }}</h2>
+            <p class="correo-label">{{ datos.correo }}</p>
+          </div>
+          <div class="member-badge">
+            <span class="badge-icon">🍽</span>
+            <span>Cliente</span>
+          </div>
+        </div>
+
+        <div class="header-chips">
+          <div class="chip">
+            <span class="chip-icon">📍</span>
+            <span>{{ datos.distrito || 'Sin distrito' }}</span>
+          </div>
+          <div class="chip">
+            <span class="chip-icon">📞</span>
+            <span>{{ datos.telefono || 'Sin teléfono' }}</span>
+          </div>
+          <div class="chip">
+            <span class="chip-icon">📅</span>
+            <span>Miembro desde {{ datos.fechaRegistro | date:'MMM yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID INFERIOR -->
+    <div class="bottom-grid">
+
+      <!-- COLUMNA IZQUIERDA: Datos personales + documento -->
+      <div class="left-col">
+
+        <!-- Datos personales -->
+        <div class="info-card">
+          <div class="card-header">
+            <div class="card-header-icon orange">👤</div>
+            <h3>Datos Personales</h3>
+          </div>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Nombres</label>
+              <span>{{ datos.nombres }}</span>
+            </div>
+            <div class="info-item">
+              <label>Apellido Paterno</label>
+              <span>{{ datos.apePaterno }}</span>
+            </div>
+            <div class="info-item">
+              <label>Apellido Materno</label>
+              <span>{{ datos.apeMaterno }}</span>
+            </div>
+            <div class="info-item">
+              <label>Correo</label>
+              <span>{{ datos.correo }}</span>
+            </div>
+            <div class="info-item">
+              <label>Teléfono</label>
+              <span>{{ datos.telefono || '—' }}</span>
+            </div>
+            <div class="info-item full">
+              <label>Dirección</label>
+              <span>{{ datos.direccion || '—' }}</span>
+            </div>
+            <div class="info-item">
+              <label>Distrito</label>
+              <span>{{ datos.distrito || '—' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Documento de identidad -->
+        <div class="info-card doc-card">
+          <div class="card-header">
+            <div class="card-header-icon red">🪪</div>
+            <h3>Documento de Identidad</h3>
+          </div>
+          <div class="doc-display">
+            <div class="doc-type-badge">{{ datos.tipoDoc }}</div>
+            <div class="doc-number">{{ datos.nroDoc }}</div>
+            <div class="doc-label">Número de documento</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: Accesos rápidos -->
+      <div class="right-col">
+
+        <div class="info-card links-card">
+          <div class="card-header">
+            <div class="card-header-icon orange">⚡</div>
+            <h3>Accesos Rápidos</h3>
+          </div>
+          <div class="quick-links">
+            <a routerLink="/cliente/resenia" class="quick-link">
+              <div class="ql-left">
+                <div class="ql-icon star">⭐</div>
+                <div class="ql-text">
+                  <span class="ql-title">Mis Reseñas</span>
+                  <span class="ql-sub">Ver y gestionar reseñas</span>
+                </div>
+              </div>
+              <span class="ql-arrow">›</span>
+            </a>
+
+            <a routerLink="/cliente/mis-reservas" class="quick-link">
+              <div class="ql-left">
+                <div class="ql-icon cal">📅</div>
+                <div class="ql-text">
+                  <span class="ql-title">Mis Reservas</span>
+                  <span class="ql-sub">Historial de reservaciones</span>
+                </div>
+              </div>
+              <span class="ql-arrow">›</span>
+            </a>
+
+            <a routerLink="/cliente/menu" class="quick-link">
+              <div class="ql-left">
+                <div class="ql-icon food">🍽️</div>
+                <div class="ql-text">
+                  <span class="ql-title">Ver Menú</span>
+                  <span class="ql-sub">Explorar nuestros platillos</span>
+                </div>
+              </div>
+              <span class="ql-arrow">›</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Mini resumen -->
+        <div class="info-card summary-card">
+          <div class="card-header">
+            <div class="card-header-icon red">📋</div>
+            <h3>Resumen</h3>
+          </div>
+          <div class="summary-items">
+            <div class="summary-item">
+              <span class="summary-label">ID Usuario</span>
+              <span class="summary-value">#{{ datos.idUsuario }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Documento</span>
+              <span class="summary-value">{{ datos.tipoDoc }} · {{ datos.nroDoc }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Registro</span>
+              <span class="summary-value">{{ datos.fechaRegistro | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>

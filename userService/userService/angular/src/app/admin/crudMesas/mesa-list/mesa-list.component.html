@@ -1,0 +1,118 @@
+<!-- crudMesas/mesa-list/mesa-list.component.html -->
+
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Gestión de Mesas</h3>
+    <a routerLink="/admin/mesas/nuevo" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Nueva Mesa
+    </a>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Tabla de mesas -->
+  <div *ngIf="!loading" class="card">
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Número</th>
+              <th>Capacidad</th>
+              <th>Zona</th>
+              <th>Estado</th>
+              <th>Cambiar Estado</th>
+              <th>Activo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let mesa of mesas">
+              <td>{{ mesa.idMesa }}</td>
+              <td>
+                <strong>Mesa {{ mesa.numeroMesa }}</strong>
+              </td>
+              <td>
+                <i class="bi bi-people-fill me-1"></i>
+                {{ mesa.capacidad }} personas
+              </td>
+              <td>
+                <span [class]="'badge ' + getBadgeClassZona(mesa.zona)">
+                  {{ mesa.zonaDescripcion }}
+                </span>
+              </td>
+              <td>
+                <span [class]="'badge ' + getBadgeClassEstado(mesa.estado)">
+                  {{ mesa.estadoDescripcion }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group btn-group-sm" role="group">
+                  <button 
+                    class="btn btn-outline-success"
+                    [class.active]="mesa.estado === 'LIBRE'"
+                    (click)="cambiarEstadoRapido(mesa, 'LIBRE')"
+                    title="Marcar como Libre">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                  <button 
+                    class="btn btn-outline-warning"
+                    [class.active]="mesa.estado === 'ASIGNADA'"
+                    (click)="cambiarEstadoRapido(mesa, 'ASIGNADA')"
+                    title="Marcar como Asignada">
+                    <i class="bi bi-clock"></i>
+                  </button>
+                  <button 
+                    class="btn btn-outline-danger"
+                    [class.active]="mesa.estado === 'OCUPADA'"
+                    (click)="cambiarEstadoRapido(mesa, 'OCUPADA')"
+                    title="Marcar como Ocupada">
+                    <i class="bi bi-person-fill"></i>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <span [class]="mesa.activo ? 'badge bg-success' : 'badge bg-secondary'">
+                  {{ mesa.activo ? 'Activa' : 'Inactiva' }}
+                </span>
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a 
+                    [routerLink]="['/admin/mesas/editar', mesa.idMesa]" 
+                    class="btn btn-sm btn-warning"
+                    title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+                  <button 
+                    (click)="confirmarEliminar(mesa)" 
+                    class="btn btn-sm btn-danger"
+                    title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="mesas.length === 0">
+              <td colspan="8" class="text-center text-muted">
+                No hay mesas registradas
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

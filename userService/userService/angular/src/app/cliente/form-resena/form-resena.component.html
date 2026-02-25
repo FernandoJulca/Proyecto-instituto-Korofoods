@@ -1,0 +1,394 @@
+
+      <div class="resena-page">
+    <!-- Loading State -->
+    <div *ngIf="isLoadingUser" class="loading-container">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p>Verificando autenticación...</p>
+    </div>
+
+    <!-- Vista para usuarios NO autenticados -->
+    <div *ngIf="!isLoadingUser && !isLoggedIn" class="guest-view">
+        <div class="resena-hero">
+            <div class="hero-overlay"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Reseñas de Nuestros Clientes</h1>
+                    <p class="hero-subtitle">
+                        Descubre lo que nuestros clientes dicen sobre nosotros
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <!-- Mensaje para invitar a iniciar sesión -->
+                    <div class="login-prompt-card">
+                        <div class="login-prompt-icon">
+                            <i class="bi bi-person-lock"></i>
+                        </div>
+                        <h3>¿Quieres dejar tu reseña?</h3>
+                        <p>Inicia sesión para compartir tu experiencia con nosotros</p>
+                        <button class="btn btn-primary btn-lg" style="background-color: #E67E22;" (click)="redirectToLogin()">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Iniciar Sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista para usuarios autenticados (HTML original) -->
+    <div *ngIf="!isLoadingUser && isLoggedIn">
+        <!-- Hero Section -->
+        <div class="resena-hero">
+            <div class="hero-overlay"></div>
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Comparte Tu Experiencia</h1>
+                    <p class="hero-subtitle">
+                        Tu opinión nos ayuda a mejorar y a crear experiencias gastronómicas aún más memorables
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <div class="" style="overflow: hidden;">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+
+                        <!-- Success Alert -->
+                        <div *ngIf="showSuccess" class="alert alert-success alert-custom fade-in" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <strong>¡Gracias por tu reseña!</strong> Tu opinión ha sido enviada exitosamente.
+                        </div>
+
+                        <!-- Error Alert -->
+                        <div *ngIf="showError" class="alert alert-danger alert-custom fade-in" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Error:</strong> {{ errorMessage }}
+                        </div>
+
+                        <!-- Form Card -->
+                        <div class="form-card">
+                            <!-- Todo el formulario original aquí -->
+                            <div class="form-header">
+                                <div class="form-icon">
+                                    <i class="bi bi-chat-heart-fill"></i>
+                                </div>
+                                <h2 class="form-title">Cuéntanos tu experiencia</h2>
+                                <p class="form-description">
+                                    Completa el formulario para compartir tu opinión sobre nuestros platos o eventos
+                                </p>
+                            </div>
+
+                            
+                        <form [formGroup]="resenaForm" (ngSubmit)="onSubmit()">
+
+                            <!-- Tipo de Entidad -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-tag-fill me-2"></i>
+                                    ¿Qué deseas calificar? <span class="text-danger">*</span>
+                                </label>
+                                <div class="tipo-entidad-options">
+                                    <div class="custom-radio">
+                                        <input type="radio" id="tipoPlato" formControlName="tipoEntidad"
+                                            [value]="TipoEntidad.PLATO" (change)="onTipoEntidadChange()">
+                                        <label for="tipoPlato" class="radio-label">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"
+                                                fill="currentColor" class="svg-plate" viewBox="0 0 16 16">
+                                                <path
+                                                    d="M2 3h12a1 1 0 0 1 1 1v1a5 5 0 0 1-5 5H6a5 5 0 0 1-5-5V4a1 1 0 0 1 1-1z" />
+                                            </svg>
+                                            <span>Plato</span>
+                                        </label>
+                                    </div>
+                                    <div class="custom-radio">
+                                        <input type="radio" id="tipoEvento" formControlName="tipoEntidad"
+                                            [value]="TipoEntidad.EVENTO" (change)="onTipoEntidadChange()">
+                                        <label for="tipoEvento" class="radio-label">
+                                            <i class="bi bi-calendar-event-fill"></i>
+                                            <span>Evento</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div *ngIf="isFieldInvalid('tipoEntidad')" class="invalid-feedback d-block">
+                                    {{ getErrorMessage('tipoEntidad') }}
+                                </div>
+                            </div>
+
+                            <!-- Seleccionar Entidad -->
+                            <div class="form-group" *ngIf="resenaForm.get('tipoEntidad')?.value">
+                                <label class="form-label">
+                                    <ng-container *ngIf="isTipoPlato; else eventoIcon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="24"
+                                            fill="currentColor" class="me-2" viewBox="0 0 16 16" class="svg-plate">
+                                            <path
+                                                d="M2 3h12a1 1 0 0 1 1 1v1a5 5 0 0 1-5 5H6a5 5 0 0 1-5-5V4a1 1 0 0 1 1-1z" />
+                                        </svg>
+                                    </ng-container>
+                                    <ng-template #eventoIcon>
+                                        <i class="bi bi-calendar-event-fill me-2"></i>
+                                    </ng-template>
+                                    Selecciona {{ isTipoPlato ? 'el plato' : 'el evento' }} <span
+                                        class="text-danger">*</span>
+                                </label>
+
+                                <!-- Buscador -->
+                                <div class="search-container">
+                                    <div class="search-wrapper">
+                                        <i class="bi bi-search search-icon"></i>
+                                        <input type="text" class="form-control search-input"
+                                            placeholder="Buscar por nombre..." [(ngModel)]="searchTerm"
+                                            (input)="onSearch()" [ngModelOptions]="{standalone: true}">
+                                        <button type="button" class="btn-clear-search" *ngIf="searchTerm"
+                                            (click)="clearSearch()">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        </button>
+                                    </div>
+                                    <div class="search-results-count" *ngIf="searchTerm">
+                                        {{ entidadesFiltradas.length }} resultado(s) encontrado(s)
+                                    </div>
+                                </div>
+
+                                <!-- Grid de opciones -->
+                                <div class="entidades-grid" *ngIf="entidadesPaginadas.length > 0">
+                                    <div *ngFor="let item of entidadesPaginadas" class="entidad-card"
+                                        [class.selected]="resenaForm.get('idEntidad')?.value == getItemId(item)"
+                                        (click)="resenaForm.patchValue({ idEntidad: getItemId(item) })">
+                                        <div class="entidad-image-wrapper">
+                                            <img [src]="getItemImagen(item)" [alt]="getItemNombre(item)"
+                                                class="entidad-image" (error)="onImgError($event)">
+                                            <div class="entidad-overlay">
+                                                <button type="button" class="btn-ver-detalle"
+                                                    (click)="openModal(item, $event)">
+                                                    <i class="bi bi-eye-fill"></i> Ver detalle
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="entidad-info">
+                                            <h5 class="entidad-nombre">{{ getItemNombre(item) }}</h5>
+                                            <p class="entidad-tipo" *ngIf="getItemTipoPlato(item) as tipoPlato">
+                                                @switch (tipoPlato) {
+                                                @case ('E') {
+                                                <i class="bi bi-egg-fried pe-2"></i>
+                                                <span>{{ traducirTipoPlato(tipoPlato) }}</span>
+                                                }
+                                                @case ('S') {
+                                                <i class="fa-solid fa-utensils pe-2"></i>
+                                                <span>{{ traducirTipoPlato(tipoPlato) }}</span>
+                                                }
+                                                @case ('P') {
+                                                <i class="bi bi-cake2 pe-2"></i>
+                                                <span>{{ traducirTipoPlato(tipoPlato) }}</span>
+                                                }
+                                                @case ('B') {
+                                                <i class="bi bi-cup-straw pe-2"></i>
+                                                <span>{{ traducirTipoPlato(tipoPlato) }}</span>
+                                                }
+                                                @default {
+                                                <i class="bi bi-card-text pe-2"></i>
+                                                <span>{{ traducirTipoPlato(tipoPlato) }}</span>
+                                                }
+                                                }
+                                            </p>
+
+                                        </div>
+                                        <div class="check-icon"
+                                            *ngIf="resenaForm.get('idEntidad')?.value == getItemId(item)">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Sin resultados -->
+                                <div class="no-results" *ngIf="entidadesFiltradas.length === 0">
+                                    <i class="bi bi-search"></i>
+                                    <p>No se encontraron resultados para "{{ searchTerm }}"</p>
+                                    <button type="button" class="btn-clear-search-alt" (click)="clearSearch()">
+                                        Limpiar búsqueda
+                                    </button>
+                                </div>
+
+                                <!-- Paginación -->
+                                <div class="pagination-container" *ngIf="totalPages > 1">
+                                    <nav aria-label="Paginación">
+                                        <ul class="pagination">
+                                            <!-- Anterior -->
+                                            <li class="page-item" [class.disabled]="currentPage === 1">
+                                                <button class="page-link" (click)="previousPage()" type="button">
+                                                    <i class="bi bi-chevron-left"></i>
+                                                </button>
+                                            </li>
+
+                                            <!-- Páginas -->
+                                            <li class="page-item" *ngFor="let page of pages"
+                                                [class.active]="currentPage === page">
+                                                <button class="page-link" (click)="goToPage(page)" type="button">
+                                                    {{ page }}
+                                                </button>
+                                            </li>
+
+                                            <!-- Siguiente -->
+                                            <li class="page-item" [class.disabled]="currentPage === totalPages">
+                                                <button class="page-link" (click)="nextPage()" type="button">
+                                                    <i class="bi bi-chevron-right"></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </nav>
+
+                                    <div class="pagination-info">
+                                        Página {{ currentPage }} de {{ totalPages }} ({{ entidadesFiltradas.length }}
+                                        total)
+                                    </div>
+                                </div>
+
+                                <div *ngIf="isFieldInvalid('idEntidad')" class="invalid-feedback d-block mt-2">
+                                    {{ getErrorMessage('idEntidad') }}
+                                </div>
+                            </div>
+                            <!-- Rating -->
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <i class="bi bi-star-fill me-2"></i>
+                                    Calificación <span class="text-danger">*</span>
+                                </label>
+                                <div class="rating-container">
+                                    <div class="stars-wrapper">
+                                        <i *ngFor="let star of [1, 2, 3, 4, 5]" class="bi star-icon"
+                                            [ngClass]="getStarClass(star)" (click)="setRating(star)"
+                                            (mouseenter)="hoverRating(star)" (mouseleave)="resetHover()"></i>
+                                    </div>
+                                    <span class="rating-text" *ngIf="selectedRating > 0">
+                                        {{ selectedRating }} de 5 estrellas
+                                    </span>
+                                </div>
+                                <div *ngIf="isFieldInvalid('calificacion')" class="invalid-feedback d-block">
+                                    {{ getErrorMessage('calificacion') }}
+                                </div>
+                            </div>
+
+                            <!-- Comentario -->
+                            <div class="form-group">
+                                <label class="form-label" for="comentario">
+                                    <i class="bi bi-chat-dots-fill me-2"></i>
+                                    Tu comentario <span class="text-danger">*</span>
+                                </label>
+                                <textarea class="form-control custom-textarea" id="comentario"
+                                    formControlName="comentario" rows="5"
+                                    placeholder="Comparte tu experiencia... ¿Qué te gustó? ¿Qué mejorarías?"
+                                    [class.is-invalid]="isFieldInvalid('comentario')"></textarea>
+                                <div class="char-counter">
+                                    {{ resenaForm.get('comentario')?.value?.length || 0 }} / 500 caracteres
+                                </div>
+                                <div *ngIf="isFieldInvalid('comentario')" class="invalid-feedback">
+                                    {{ getErrorMessage('comentario') }}
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary-custom" (click)="resetForm()"
+                                    [disabled]="isSubmitting">
+                                    <i class="bi bi-arrow-counterclockwise me-2"></i>
+                                    Limpiar
+                                </button>
+                                <button type="submit" class="btn btn-primary-custom" [disabled]="isSubmitting">
+                                    <span *ngIf="!isSubmitting">
+                                        <i class="bi bi-send-fill me-2"></i>
+                                        Enviar Reseña
+                                    </span>
+                                    <span *ngIf="isSubmitting">
+                                        <span class="spinner-border spinner-border-sm me-2" role="status"
+                                            aria-hidden="true"></span>
+                                        Enviando...
+                                    </span>
+                                </button>
+                            </div>
+
+                        </form>
+                        </div>
+
+                        <!-- Info Cards -->
+                        <div class="info-cards mt-5">
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="info-card">
+                                        <i class="bi bi-shield-check info-icon"></i>
+                                        <h5>Seguro y Confiable</h5>
+                                        <p>Tus datos están protegidos</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="info-card">
+                                        <i class="bi bi-people info-icon"></i>
+                                        <h5>Comunidad</h5>
+                                        <p>Ayuda a otros clientes</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <div class="info-card">
+                                        <i class="bi bi-heart info-icon"></i>
+                                        <h5>Mejoramos Contigo</h5>
+                                        <p>Tu opinión nos importa</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>              
+
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+        <button class="modal-close" (click)="closeModal()">
+            <i class="bi bi-x-lg"></i>
+        </button>
+
+        <div class="modal-content" *ngIf="selectedItem">
+            <div class="modal-image">
+                <img [src]="getItemImagen(selectedItem)" [alt]="getItemNombre(selectedItem)"
+                    (error)="onImgError($event)">
+            </div>
+
+            <div class="modal-info">
+                <div class="modal-badge">
+                    <i *ngIf="!isTipoPlato" class="bi bi-calendar-event-fill"></i>
+                    <svg *ngIf="isTipoPlato" xmlns="http://www.w3.org/2000/svg" width="20" height="24"
+                        fill="currentColor" class="text-white" viewBox="0 0 16 16">
+                        <path d="M2 3h12a1 1 0 0 1 1 1v1a5 5 0 0 1-5 5H6a5 5 0 0 1-5-5V4a1 1 0 0 1 1-1z" />
+                    </svg>
+                    <span>{{ isTipoPlato ? 'Plato' : 'Evento' }}</span>
+                </div>
+
+                <h2 class="modal-title">{{ getItemNombre(selectedItem) }}</h2>
+
+                <div class="modal-description">
+                    <p>{{ getItemDescripcion(selectedItem) }}</p>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" (click)="closeModal()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-modal-select" (click)="selectItemFromModal()">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        Seleccionar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

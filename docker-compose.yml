@@ -1,0 +1,283 @@
+version: "3.8"
+
+services:
+
+  # ==================== INFRAESTRUCTURA ====================
+
+  eureka-server:
+    build: ./eurekaService
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sql
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/01-init-db.sh
+      - ./userService/userService/DataBase/TABLAS_INSERTS.sql:/docker-entrypoint-initdb.d/scripts/user-tablas.sql
+      - ./userService/userService/DataBase/DATA_INSERTS.sql:/docker-entrypoint-initdb.d/scripts/user-inserts.sql
+      - ./tableService/tableService/DataBase/TABLAS_TABLE_INSERT.sql:/docker-entrypoint-initdb.d/scripts/table-tablas.sql
+      - ./tableService/tableService/DataBase/DATA_TABLE_INSERT.sql:/docker-entrypoint-initdb.d/scripts/table-inserts.sql
+      - ./reservationService/reservationService/DataBase/TABLAS_RESERVATION_INSERT.sql:/docker-entrypoint-initdb.d/scripts/reservation-tablas.sql
+      - ./reservationService/reservationService/DataBase/DATA_RESERVATION_INSERT.sql:/docker-entrypoint-initdb.d/scripts/reservation-inserts.sql
+      - ./qualificationService/qualificationService/DataBase/TABLAS_QUALIFICATION_INSERT.sql:/docker-entrypoint-initdb.d/scripts/qualification-tablas.sql
+      - ./qualificationService/qualificationService/DataBase/DATA_QUALIFICATION_INSERT.sql:/docker-entrypoint-initdb.d/scripts/qualification-inserts.sql
+      - ./paymentService/paymentService/DataBase/TABLAS_PAYMENT_INSERT.sql:/docker-entrypoint-initdb.d/scripts/payment-tablas.sql
+      - ./paymentService/paymentService/DataBase/DATA_PAYMENT_INSERT.sql:/docker-entrypoint-initdb.d/scripts/payment-inserts.sql
+      - ./orderService/orderService/DataBase/TABLAS_ORDER_INSERT.sql:/docker-entrypoint-initdb.d/scripts/order-tablas.sql
+      - ./orderService/orderService/DataBase/DATA_ORDER_INSERT.sql:/docker-entrypoint-initdb.d/scripts/order-inserts.sql
+      - ./menuService/menuService/DataBase/TABLAS_MENU_INSERT.sql:/docker-entrypoint-initdb.d/scripts/menu-tablas.sql
+      - ./menuService/menuService/DataBase/DATA_MENU_INSERT.sql:/docker-entrypoint-initdb.d/scripts/menu-inserts.sql
+      - ./eventService/eventService/DataBase/TABLAS_EVENT_INSERT.sql:/docker-entrypoint-initdb.d/scripts/event-tablas.sql
+      - ./eventService/eventService/DataBase/DATA_EVENT_INSERT.sql:/docker-entrypoint-initdb.d/scripts/event-inserts.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== MICROSERVICIOS ====================
+
+  user-service:
+    build: ./userService/userService
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_USER_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/DB_MENSAJES
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      CLOUDINARY_NAME: ${CLOUDINARY_NAME}
+      CLOUDINARY_KEY_KOROFOODS: ${CLOUDINARY_KEY_KOROFOODS}
+      CLOUDINARY_SECRET_KOROFOODS: ${CLOUDINARY_SECRET_KOROFOODS}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+
+  qualification-service:
+    build: ./qualificationService/qualificationService
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_QUALIFICATION_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+  table-service:
+    build: ./tableService/tableService
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_TABLE_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+  reservation-service:
+    build: ./reservationService/reservationService
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_RESERVATION_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER}
+
+  payment-service:
+    build: ./paymentService/paymentService
+    ports:
+      - "8085:8085"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_PAYMENT_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      GOOGLE_VISION_API_KEY: ${GOOGLE_VISION_API_KEY}
+
+  order-service:
+    build: ./orderService/orderService
+    ports:
+      - "8086:8086"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_ORDER_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+  menu-service:
+    build: ./menuService/menuService
+    ports:
+      - "8087:8087"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_MENU_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      CLOUDINARY_NAME: ${CLOUDINARY_NAME}
+      CLOUDINARY_KEY_KOROFOODS: ${CLOUDINARY_KEY_KOROFOODS}
+      CLOUDINARY_SECRET_KOROFOODS: ${CLOUDINARY_SECRET_KOROFOODS}
+
+  event-service:
+    build: ./eventService/eventService 
+    ports:
+      - "8088:8088"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_EVENT_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      CLOUDINARY_NAME: ${CLOUDINARY_NAME}    
+      CLOUDINARY_KEY_KOROFOODS: ${CLOUDINARY_KEY_KOROFOODS}
+      CLOUDINARY_SECRET_KOROFOODS: ${CLOUDINARY_SECRET_KOROFOODS}
+
+  user-service-soap:
+    build: ./userServiceSoap
+    ports:
+      - "8093:8093"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/DB_USER_SERVICE
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: sql
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+  api-gateway:
+    build: ./apiGateway
+    ports:
+      - "8098:8098"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+      JWT_SECRET: ${JWT_SECRET}
+
+# ==================== VOLÚMENES ====================
+
+volumes:
+  postgres_data:
+  mongo_data:

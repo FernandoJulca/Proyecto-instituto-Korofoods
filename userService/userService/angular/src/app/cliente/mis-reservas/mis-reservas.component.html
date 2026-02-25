@@ -1,0 +1,387 @@
+<div class="reservas-container">
+  <!-- Header -->
+  <div class="header">
+    <h1 class="titulo-principal">Mis Reservas</h1>
+    <p class="subtitulo">Gestiona y consulta tus reservas</p>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <div class="filtro-grupo">
+      <label for="filtroFecha" class="filtro-label">
+        <svg class="icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        Fecha
+      </label>
+      <input
+        type="date"
+        id="filtroFecha"
+        [(ngModel)]="filtroFecha"
+        (change)="onFiltroFechaChange()"
+        class="filtro-input"
+      />
+    </div>
+
+    <div class="filtro-grupo">
+      <label for="filtroEstado" class="filtro-label">
+        <svg class="icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
+        Estado
+      </label>
+      <select
+        id="filtroEstado"
+        [(ngModel)]="filtroEstado"
+        (change)="onFiltroEstadoChange()"
+        class="filtro-select"
+      >
+        <option value="">Todos los estados</option>
+        <option *ngFor="let estado of estadosDisponibles" [value]="estado">
+          {{ estado }}
+        </option>
+      </select>
+    </div>
+
+    <button class="btn-limpiar" (click)="limpiarFiltros()" *ngIf="filtroFecha || filtroEstado">
+      Limpiar filtros
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando reservas...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-container" *ngIf="error && !loading">
+    <svg class="icono-error" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <p>{{ error }}</p>
+    <button class="btn-reintentar" (click)="cargarReservas()">Reintentar</button>
+  </div>
+
+  <!-- Lista de Reservas -->
+  <div class="reservas-grid" *ngIf="!loading && !error">
+    <div class="reserva-card" *ngFor="let reserva of reservasFiltradas" (click)="verDetalle(reserva)">
+
+      <!-- Header de la card -->
+      <div class="card-header">
+        <div class="numero-reserva">
+          <span class="label-small">Número de Reserva</span>
+          <span class="numero">#{{ reserva.idReserva }}</span>
+        </div>
+        <div class="estado-badge" [ngClass]="getEstadoClass(reserva.estado)">
+          {{ reserva.estado }}
+        </div>
+      </div>
+
+      <!-- Contenido principal -->
+      <div class="card-body">
+        <div class="info-grupo">
+          <svg class="icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <div>
+            <p class="label">Cliente</p>
+            <p class="valor">{{ getNombreCompleto(reserva) }}</p>
+          </div>
+        </div>
+
+        <div class="info-grupo">
+          <svg class="icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <div>
+            <p class="label">Fecha y Hora</p>
+            <p class="valor">{{ formatearFechaCorta(reserva.fechaHora) }} - {{ formatearHora(reserva.fechaHora) }}</p>
+          </div>
+        </div>
+
+        <div class="info-grupo">
+          <svg class="icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+            <line x1="6" y1="12" x2="6.01" y2="12"></line>
+            <line x1="10" y1="12" x2="18" y2="12"></line>
+          </svg>
+          <div>
+            <p class="label">Mesa</p>
+            <p class="valor">Mesa {{ reserva.numMesa }} - {{ reserva.zona }} ({{ reserva.capacidad }} personas)</p>
+          </div>
+        </div>
+
+        <div class="info-grupo" *ngIf="reserva.nombreEvento">
+          <svg class="icono" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <div>
+            <p class="label">Evento</p>
+            <p class="valor valor-evento">{{ reserva.nombreEvento }}</p>
+          </div>
+        </div>
+
+        <div class="observaciones" *ngIf="reserva.observaciones">
+          <p class="label">Observaciones</p>
+          <p class="texto-observaciones">{{ reserva.observaciones }}</p>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="card-actions" (click)="$event.stopPropagation()">
+        <button
+          class="btn-accion btn-codigo"
+          *ngIf="puedeEnviarCodigo(reserva.estado)"
+          (click)="abrirModalEnviarCodigo(reserva)"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          Enviar Código
+        </button>
+
+        <button
+          class="btn-accion btn-cancelar"
+          *ngIf="puedeCancelarReserva(reserva.estado)"
+          (click)="abrirModalCancelar(reserva)"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          Cancelar Reserva
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="reservasFiltradas.length === 0">
+      <svg class="icono-empty" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <h3>No hay reservas</h3>
+      <p>No se encontraron reservas con los filtros aplicados</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalle de Reserva -->
+<div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
+  <div class="modal-content modal-detalle" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Detalle de Reserva #{{ reservaSeleccionada?.idReserva }}</h2>
+      <button class="btn-cerrar" (click)="cerrarModalDetalle()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="reservaSeleccionada">
+      <div class="detalle-section">
+        <h3>Información del Cliente</h3>
+        <div class="detalle-grid">
+          <div class="detalle-item">
+            <span class="detalle-label">Nombre Completo</span>
+            <span class="detalle-valor">{{ getNombreCompleto(reservaSeleccionada) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detalle-section">
+        <h3>Información de la Reserva</h3>
+        <div class="detalle-grid">
+          <div class="detalle-item">
+            <span class="detalle-label">Número de Reserva</span>
+            <span class="detalle-valor">#{{ reservaSeleccionada.idReserva }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Tipo de Reserva</span>
+            <span class="detalle-valor badge" [ngClass]="getTipoReservaClass(reservaSeleccionada.tipoReserva)">
+              {{ reservaSeleccionada.tipoReserva }}
+            </span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Estado</span>
+            <span class="detalle-valor badge" [ngClass]="getEstadoClass(reservaSeleccionada.estado)">
+              {{ reservaSeleccionada.estado }}
+            </span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Fecha y Hora</span>
+            <span class="detalle-valor">{{ formatearFecha(reservaSeleccionada.fechaHora) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detalle-section">
+        <h3>Información de la Mesa</h3>
+        <div class="detalle-grid">
+          <div class="detalle-item">
+            <span class="detalle-label">Número de Mesa</span>
+            <span class="detalle-valor">{{ reservaSeleccionada.numMesa }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Zona</span>
+            <span class="detalle-valor">{{ reservaSeleccionada.zona }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Capacidad</span>
+            <span class="detalle-valor">{{ reservaSeleccionada.capacidad }} personas</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detalle-section" *ngIf="reservaSeleccionada.nombreEvento">
+        <h3>Información del Evento</h3>
+        <div class="detalle-grid">
+          <div class="detalle-item">
+            <span class="detalle-label">Nombre del Evento</span>
+            <span class="detalle-valor evento-nombre">{{ reservaSeleccionada.nombreEvento }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Inicio del Evento</span>
+            <span class="detalle-valor">{{ formatearFecha(reservaSeleccionada.fechaInicio!) }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="detalle-label">Fin del Evento</span>
+            <span class="detalle-valor">{{ formatearFecha(reservaSeleccionada.fechaFin!) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detalle-section" *ngIf="reservaSeleccionada.observaciones">
+        <h3>Observaciones</h3>
+        <p class="observaciones-texto">{{ reservaSeleccionada.observaciones }}</p>
+      </div>
+
+      <div class="modal-actions">
+        <button
+          class="btn-modal btn-codigo-modal"
+          *ngIf="puedeEnviarCodigo(reservaSeleccionada.estado)"
+          (click)="abrirModalEnviarCodigo(reservaSeleccionada); cerrarModalDetalle()"
+        >
+          Enviar Código de Verificación
+        </button>
+
+        <button
+          class="btn-modal btn-cancelar-modal"
+          *ngIf="puedeCancelarReserva(reservaSeleccionada.estado)"
+          (click)="abrirModalCancelar(reservaSeleccionada); cerrarModalDetalle()"
+        >
+          Cancelar Reserva
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Enviar Código -->
+<div class="modal-overlay" *ngIf="mostrarModalEnviarCodigo" (click)="cerrarModalEnviarCodigo()">
+  <div class="modal-content modal-codigo" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Enviar Código de Verificación</h2>
+      <button class="btn-cerrar" (click)="cerrarModalEnviarCodigo()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-descripcion">Selecciona el medio por el cual deseas recibir el código de verificación:</p>
+      
+      <div class="opciones-envio">
+        <button class="opcion-btn" (click)="enviarCodigoVerificacion('EMAIL')">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span>Correo Electrónico</span>
+        </button>
+
+        <button class="opcion-btn" (click)="enviarCodigoVerificacion('SMS')">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          <span>SMS</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cancelar Reserva -->
+<div class="modal-overlay" *ngIf="mostrarModalCancelar" (click)="cerrarModalCancelar()">
+  <div class="modal-content modal-cancelar" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Cancelar Reserva</h2>
+      <button class="btn-cerrar" (click)="cerrarModalCancelar()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="warning-icon">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <h3>¿Estás seguro de cancelar esta reserva?</h3>
+      <p class="modal-descripcion">Esta acción no se puede deshacer. La reserva #{{ reservaSeleccionada?.idReserva }} será cancelada permanentemente.</p>
+      
+      <div class="modal-actions">
+        <button class="btn-modal btn-secondary" (click)="cerrarModalCancelar()">
+          No, mantener reserva
+        </button>
+        <button class="btn-modal btn-danger" (click)="confirmarCancelacion()">
+          Sí, cancelar reserva
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast de mensajes -->
+<div class="toast-container" *ngIf="mostrarMensaje">
+  <div class="toast" [ngClass]="'toast-' + tipoMensaje">
+    <svg class="toast-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" *ngIf="tipoMensaje === 'success'">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <svg class="toast-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" *ngIf="tipoMensaje === 'error'">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="15" y1="9" x2="9" y2="15"></line>
+      <line x1="9" y1="9" x2="15" y2="15"></line>
+    </svg>
+    <span>{{ mensaje }}</span>
+    <button class="toast-close" (click)="cerrarMensaje()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+</div>

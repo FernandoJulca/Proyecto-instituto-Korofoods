@@ -1,0 +1,226 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">
+            {{ isEditMode ? "Editar Evento" : "Nuevo Evento" }}
+          </h4>
+        </div>
+        <div class="card-body">
+          <!-- Mensaje de error -->
+          <div
+            *ngIf="error"
+            class="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            {{ error }}
+            <button
+              type="button"
+              class="btn-close"
+              (click)="error = ''"
+              aria-label="Close"
+            ></button>
+          </div>
+
+          <form [formGroup]="eventoForm" (ngSubmit)="onSubmit()">
+            <!-- Nombre -->
+            <div class="mb-3">
+              <label for="nombre" class="form-label"
+                >Nombre <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="nombre"
+                formControlName="nombre"
+                [class.is-invalid]="nombre?.invalid && nombre?.touched"
+              />
+              <div
+                *ngIf="nombre?.invalid && nombre?.touched"
+                class="invalid-feedback"
+              >
+                <div *ngIf="nombre?.errors?.['required']">
+                  El nombre es obligatorio
+                </div>
+                <div *ngIf="nombre?.errors?.['maxlength']">
+                  El nombre no puede exceder 100 caracteres
+                </div>
+              </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea
+                class="form-control"
+                id="descripcion"
+                rows="3"
+                formControlName="descripcion"
+                [class.is-invalid]="
+                  descripcion?.invalid && descripcion?.touched
+                "
+              ></textarea>
+              <div
+                *ngIf="descripcion?.invalid && descripcion?.touched"
+                class="invalid-feedback"
+              >
+                <div *ngIf="descripcion?.errors?.['maxlength']">
+                  La descripción no puede exceder 500 caracteres
+                </div>
+              </div>
+            </div>
+
+            <!-- Temática -->
+            <div class="mb-3">
+              <label for="idTematica" class="form-label">Temática</label>
+              <select
+                class="form-select"
+                id="idTematica"
+                formControlName="idTematica"
+              >
+                <option [value]="null">Sin temática</option>
+                <option
+                  *ngFor="let tematica of tematicas"
+                  [value]="tematica.idTematica"
+                >
+                  {{ tematica.nombre }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Fecha -->
+            <div class="mb-3">
+              <label for="fecha" class="form-label"
+                >Fecha de inicio del Evento <span class="text-danger">*</span></label
+              >
+              <input
+                type="datetime-local"
+                class="form-control"
+                id="fecha"
+                formControlName="fechaInicio"
+                [class.is-invalid]="fecha?.invalid && fecha?.touched"
+              />
+              <div
+                *ngIf="fecha?.invalid && fecha?.touched"
+                class="invalid-feedback"
+              >
+                <div *ngIf="fecha?.errors?.['required']">
+                  La fecha es obligatoria
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="fecha" class="form-label"
+                >Fecha de fin del Evento <span class="text-danger">*</span></label
+              >
+              <input
+                type="datetime-local"
+                class="form-control"
+                id="fecha"
+                formControlName="fechaFin"
+                [class.is-invalid]="fecha?.invalid && fecha?.touched"
+              />
+              <div
+                *ngIf="fecha?.invalid && fecha?.touched"
+                class="invalid-feedback"
+              >
+                <div *ngIf="fecha?.errors?.['required']">
+                  La fecha es obligatoria
+                </div>
+              </div>
+            </div>
+
+            <!-- Costo -->
+            <div class="mb-3">
+              <label for="costo" class="form-label"
+                >Costo (S/.) <span class="text-danger">*</span></label
+              >
+              <input
+                type="number"
+                class="form-control"
+                id="costo"
+                formControlName="costo"
+                step="0.01"
+                [class.is-invalid]="costo?.invalid && costo?.touched"
+              />
+              <div
+                *ngIf="costo?.invalid && costo?.touched"
+                class="invalid-feedback"
+              >
+                <div *ngIf="costo?.errors?.['required']">
+                  El costo es obligatorio
+                </div>
+                <div *ngIf="costo?.errors?.['min']">
+                  El costo debe ser mayor a 0
+                </div>
+              </div>
+            </div>
+
+            <!-- URL Imagen (opcional) -->
+            <div class="mb-3">
+              <label class="form-label">Imagen del Evento</label>
+
+              <!-- Preview de imagen -->
+              <div *ngIf="imagenPreview" class="imagen-preview-container mb-3">
+                <img
+                  [src]="imagenPreview"
+                  alt="Preview"
+                  class="imagen-preview w-100"
+                />
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger mt-2"
+                  (click)="removerImagen()"
+                >
+                  <i class="bi bi-trash"></i> Remover imagen
+                </button>
+              </div>
+
+              <!-- Botón para seleccionar imagen -->
+              <div *ngIf="!imagenPreview">
+                <label for="imagenInput" class="btn btn-outline-primary">
+                  <i class="bi bi-upload"></i> Seleccionar imagen
+                </label>
+                <input
+                  type="file"
+                  id="imagenInput"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  style="display: none"
+                />
+                <small class="form-text text-muted d-block mt-2">
+                  Formatos aceptados: JPG, PNG, GIF. Tamaño máximo: 5MB.
+                </small>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex gap-2 justify-content-end">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="cancelar()"
+                [disabled]="loading"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="loading || eventoForm.invalid"
+              >
+                <span
+                  *ngIf="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                ></span>
+                {{ isEditMode ? "Actualizar" : "Guardar" }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

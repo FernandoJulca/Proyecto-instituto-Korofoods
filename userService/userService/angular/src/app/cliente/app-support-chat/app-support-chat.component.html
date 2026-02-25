@@ -1,0 +1,184 @@
+<!-- CHAT DE SOPORTE - COMPONENTE FLOTANTE -->
+<div class="koro-chat-widget" [class.koro-chat-abierto]="chatAbierto">
+  <!-- BOTÓN FLOTANTE PARA ABRIR -->
+  @if (!chatAbierto) {
+    <button class="koro-chat-toggle" (click)="toggleChat()">
+      <svg class="koro-chat-icono" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      @if (mensajesNoLeidos > 0) {
+        <span class="koro-chat-badge">
+          {{ mensajesNoLeidos }}
+        </span>
+      }
+    </button>
+  }
+
+  <!-- VENTANA DE CHAT -->
+  @if (chatAbierto) {
+    <div class="koro-chat-ventana">
+      <!-- HEADER -->
+      <div class="koro-chat-header">
+        <div class="koro-chat-header-info">
+          <div class="koro-chat-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
+              />
+            </svg>
+          </div>
+          <div class="koro-chat-header-text">
+            <h3 class="koro-chat-titulo">Asistente Virtual</h3>
+            <p class="koro-chat-estado">
+              <span class="koro-chat-estado-punto"></span>
+              Siempre en línea
+            </p>
+          </div>
+        </div>
+        <button class="koro-chat-cerrar" (click)="toggleChat()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path
+              d="M18 6L6 18M6 6l12 12"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <!-- TABS DE PREGUNTAS FRECUENTES -->
+      <div class="koro-chat-tabs">
+        <p class="koro-chat-tabs-titulo">PREGUNTAS FRECUENTES</p>
+        <div class="koro-chat-tabs-lista">
+          <button
+            class="koro-chat-tab"
+            [class.koro-chat-tab-activo]="tabActivo === 'reserva'"
+            (click)="cambiarTab('reserva')"
+          >
+            ¿Cómo reservar?
+          </button>
+          <button
+            class="koro-chat-tab"
+            [class.koro-chat-tab-activo]="tabActivo === 'tolerancia'"
+            (click)="cambiarTab('tolerancia')"
+          >
+            Tolerancia
+          </button>
+          <button
+            class="koro-chat-tab"
+            [class.koro-chat-tab-activo]="tabActivo === 'pago'"
+            (click)="cambiarTab('pago')"
+          >
+            Pago anticipado
+          </button>
+        </div>
+      </div>
+
+      <!-- ÁREA DE MENSAJES -->
+      <div class="koro-chat-mensajes" #mensajesContainer>
+        <!-- Mensaje inicial del bot -->
+        <div class="koro-chat-mensaje koro-chat-mensaje-bot">
+          <div class="koro-chat-mensaje-avatar">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
+              />
+            </svg>
+          </div>
+          <div class="koro-chat-mensaje-contenido">
+            <div class="koro-chat-mensaje-burbuja">
+              <p>¡Hola! 👋 ¿En qué puedo ayudarte hoy?</p>
+              <p>Selecciona un tema arriba o escribe tu pregunta.</p>
+            </div>
+            <span class="koro-chat-mensaje-hora">{{ horaActual }}</span>
+          </div>
+        </div>
+
+        <!-- Mensajes dinámicos -->
+        @for (mensaje of mensajes; track mensaje) {
+          <div
+            class="koro-chat-mensaje"
+            [class.koro-chat-mensaje-bot]="mensaje.tipo === 'bot'"
+            [class.koro-chat-mensaje-usuario]="mensaje.tipo === 'usuario'"
+          >
+            @if (mensaje.tipo === "bot") {
+              <div class="koro-chat-mensaje-avatar">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
+                  />
+                </svg>
+              </div>
+            }
+            <div class="koro-chat-mensaje-contenido">
+              <div class="koro-chat-mensaje-burbuja">
+                <p>{{ mensaje.texto }}</p>
+              </div>
+              <span class="koro-chat-mensaje-hora">{{ mensaje.hora }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Indicador de escritura -->
+        @if (botEscribiendo) {
+          <div class="koro-chat-mensaje koro-chat-mensaje-bot">
+            <div class="koro-chat-mensaje-avatar">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"
+                />
+              </svg>
+            </div>
+            <div class="koro-chat-mensaje-contenido">
+              <div class="koro-chat-mensaje-burbuja koro-chat-escribiendo">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- INPUT DE MENSAJE -->
+      <div class="koro-chat-input-area">
+        <input
+          type="text"
+          class="koro-chat-input"
+          placeholder="Escribe un mensaje..."
+          [(ngModel)]="mensajeActual"
+          (keydown.enter)="enviarMensaje()"
+          [disabled]="botEscribiendo"
+        />
+
+        <button
+          class="koro-chat-enviar"
+          (click)="enviarMensaje()"
+          [disabled]="!mensajeActual.trim() || botEscribiendo"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- BOTÓN DE MINIMIZAR -->
+      <button class="koro-chat-minimizar" (click)="toggleChat()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path
+            d="M19 9l-7 7-7-7"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </div>
+  }
+</div>

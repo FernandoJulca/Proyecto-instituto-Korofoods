@@ -1,0 +1,136 @@
+<div class="menu-container">
+    <!-- Hero Section -->
+    <section class="menu-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Nuestro Menú</h1>
+            <p class="hero-description">
+                Descubre nuestra exquisita selección de platos asiáticos auténticos,
+                perfectos para cualquier ocasión
+            </p>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download-section">
+        <div class="download-card">
+            <div class="download-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.97917 19.8042 4.5875 19.4125C4.19583 19.0208 4 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.8042 19.0208 19.4125 19.4125C19.0208 19.8042 18.55 20 18 20H6Z"
+                        fill="currentColor" />
+                </svg>
+            </div>
+
+            <div class="download-content">
+                <h2 class="download-title">Descargar Menú Completo</h2>
+                <p class="download-description">
+                    Obtén nuestro menú completo en formato PDF para llevarlo contigo
+                </p>
+            </div>
+
+            <button class="download-button" (click)="descargarMenuPdf()" [disabled]="isDownloading"
+                [class.downloading]="isDownloading">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 16L7 11L8.4 9.55L11 12.15V4H13V12.15L15.6 9.55L17 11L12 16ZM6 20C5.45 20 4.97917 19.8042 4.5875 19.4125C4.19583 19.0208 4 18.55 4 18V15H6V18H18V15H20V18C20 18.55 19.8042 19.0208 19.4125 19.4125C19.0208 19.8042 18.55 20 18 20H6Z"
+                        fill="currentColor" />
+                </svg>
+                <span *ngIf="!isDownloading">Descargar PDF</span>
+                <span *ngIf="isDownloading">Descargando...</span>
+            </button>
+        </div>
+    </section>
+    <section class="filters-section">
+        <div class="filters-container">
+            <button *ngFor="let tipo of tiposPlato" class="filter-button" [class.active]="filtroActivo === tipo"
+                (click)="filtrarPlatos(tipo)">
+                <ng-container *ngIf="tipo === 'Todos'; else mostrarLabel">
+                    Todos
+                </ng-container>
+
+                <ng-template #mostrarLabel>
+                    {{ tipoPlatoLabels[tipo] }}
+                </ng-template>
+            </button>
+        </div>
+    </section>
+
+
+    <section class="featured-section">
+        <div class="opciones-overlay"></div>
+        <div class="featured-header">
+            <h2 class="featured-title">Platos Destacados</h2>
+            <p class="featured-description">
+                Nuestras especialidades más populares que combinan tradición asiática con toques modernos
+            </p>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-container">
+            <div class="spinner"></div>
+            <p>Cargando platos...</p>
+        </div>
+
+        <div *ngIf="!isLoading" class="platos-container">
+            <div *ngFor="let tipo of obtenerTiposVisibles()" class="tipo-section">
+                <div class="tipo-header">
+                    <h3 class="tipo-title">{{ tipoPlatoLabels[tipo] }}</h3>
+                    <div class="tipo-divider"></div>
+                </div>
+
+                <div class="swiper-container-wrapper">
+                    <div [class]="'swiper swiper-' + getSwiperClass(tipo)">
+                        <div class="swiper-wrapper">
+                            <div *ngFor="let plato of platosFiltrados[tipo]" class="swiper-slide">
+                                <div class="plato-card">
+                                    <div class="plato-image-container">
+                                        <img [src]="plato.imagen" [alt]="plato.nombre" class="plato-image"
+                                            (error)="setDefaultImage($event)">
+                                        <div class="plato-overlay">
+                                            <!-- Etiquetas implementadas -->
+                                            <div class="etiquetas-container">
+                                                <span *ngFor="let etiqueta of plato.etiquetas" class="etiqueta-badge">
+                                                    {{ etiqueta.nombre }}
+                                                </span>
+                                            </div>
+<span class="plato-type-badge">{{ getTipoPlato(plato.tipoPlato) }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="plato-info">
+                                        <h4 class="plato-nombre">{{ plato.nombre }}</h4>
+                                        <div class="plato-footer">
+                                            <span class="plato-tipo">{{ tipoPlatoLabels[tipo]}}</span>
+                                            <span class="plato-precio">S/ {{ plato.precio.toFixed(2) }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation -->
+                        <div [class]="'swiper-button-prev swiper-button-prev-' + getSwiperClass(tipo)"></div>
+                        <div [class]="'swiper-button-next swiper-button-next-' + getSwiperClass(tipo)"></div>
+
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div *ngIf="!platosFiltrados[tipo] || platosFiltrados[tipo].length === 0" class="empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                        <path
+                            d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"
+                            fill="#ccc" />
+                    </svg>
+                    <p>No hay platos disponibles en esta categoría</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-to-top" (click)="scrollToTop()" [class.visible]="showScrollButton">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+</div>

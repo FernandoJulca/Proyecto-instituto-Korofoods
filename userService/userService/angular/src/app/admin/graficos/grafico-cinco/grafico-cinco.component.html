@@ -1,0 +1,27 @@
+<div class="ranking-container">
+  <h3 class="titulo">Empleados del Mes</h3>
+
+  <div
+    class="empleado-item"
+    *ngFor="let emp of datos; let i = index"
+    [class]="'empleado-item pos-' + i"
+  >
+    <span
+      class="material-icons medalla"
+      [ngClass]="{ oro: i === 0, plata: i === 1, bronce: i === 2, otro: i > 2 }"
+    >
+      {{ i < 3 ? "emoji_events" : "tag" }}
+    </span>
+    <span *ngIf="i >= 3" class="num-pos">{{ i + 1 }}</span>
+
+    <div class="empleado-info">
+      <div class="avatar">{{ emp.nombre.charAt(0) }}</div>
+      <div class="datos">
+        <span class="nombre">{{ emp.nombre }}</span>
+        <span class="completado">{{ emp.completado }} pedidos completados</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="vacio" *ngIf="datos.length === 0">Sin datos este mes</p>
+</div>

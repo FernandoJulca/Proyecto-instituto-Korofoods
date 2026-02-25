@@ -1,0 +1,871 @@
+<!-- ======================== HERO ======================== -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Eventos Temáticos</h1>
+    <p class="hero-subtitle">
+      Sumérgete en experiencias gastronómicas únicas inspiradas en anime,
+      películas, cómics y más
+    </p>
+    <div class="confirmation-badge">
+      <span class="check-icon">✦</span>
+      <span>Reserva tu lugar ahora</span>
+    </div>
+  </div>
+</section>
+
+<!-- ======================== PASO 1: LISTADO ======================== -->
+<section class="reservation-section" *ngIf="paso === 1">
+  <div class="container">
+    <div class="stepper">
+      <div class="step" [class.active]="paso >= 1" [class.completed]="paso > 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Evento</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 2" [class.completed]="paso > 2">
+        <div class="step-number">2</div>
+        <div class="step-label">Personas</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 3" [class.completed]="paso > 3">
+        <div class="step-number">3</div>
+        <div class="step-label">Mesa</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 4" [class.completed]="paso > 4">
+        <div class="step-number">4</div>
+        <div class="step-label">Resumen</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 5">
+        <div class="step-number">5</div>
+        <div class="step-label">Pago</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="et-filters">
+      <div class="et-filter-row">
+        <div class="et-filter-field">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            placeholder="Buscar eventos..."
+            [(ngModel)]="filtroNombre"
+            (ngModelChange)="aplicarFiltros()"
+          />
+        </div>
+        <div class="et-filter-field">
+          <i class="bi bi-calendar3"></i>
+          <input
+            type="date"
+            [(ngModel)]="filtroFechaDesde"
+            (ngModelChange)="aplicarFiltros()"
+            title="Desde"
+          />
+        </div>
+        <div class="et-filter-field">
+          <i class="bi bi-calendar3-range"></i>
+          <input
+            type="date"
+            [(ngModel)]="filtroFechaHasta"
+            (ngModelChange)="aplicarFiltros()"
+            title="Hasta"
+          />
+        </div>
+        <div class="et-filter-field et-filter-small">
+          <i class="bi bi-people"></i>
+          <input
+            type="number"
+            placeholder="Aforo mín."
+            [(ngModel)]="filtroAforo"
+            min="1"
+            (ngModelChange)="aplicarFiltros()"
+          />
+        </div>
+        <button class="et-btn-clear" (click)="limpiarFiltros()">
+          <i class="bi bi-x-lg"></i> Limpiar
+        </button>
+      </div>
+    </div>
+
+    <p class="et-count">
+      <i class="bi bi-grid-3x3-gap-fill"></i>
+      {{ eventosFiltrados.length }} eventos encontrados
+    </p>
+
+    <div *ngIf="cargando" class="et-loading">
+      <div class="et-spinner"></div>
+      <p>Cargando eventos...</p>
+    </div>
+
+    <div class="et-events-grid" *ngIf="!cargando">
+      <div
+        class="et-event-card"
+        *ngFor="let evento of eventosFiltrados"
+        (click)="seleccionarEvento(evento)"
+      >
+        <div class="et-card-img">
+          <img
+            *ngIf="evento.imagen"
+            [src]="evento.imagen"
+            [alt]="evento.nombre"
+          />
+          <div *ngIf="!evento.imagen" class="et-card-placeholder">
+            {{ getEmojiTematica(evento.tematica) }}
+          </div>
+          <span *ngIf="evento.tematica" class="et-tag-tematica">{{
+            evento.tematica
+          }}</span>
+          <span
+            *ngIf="evento.aforo !== undefined"
+            class="et-tag-aforo"
+            [class.aforo-cero]="evento.aforo != 0"
+          >
+            <i class="bi bi-people-fill"></i> {{ evento.aforo }}
+          </span>
+        </div>
+        <div class="et-card-body">
+          <h3>{{ evento.nombre }}</h3>
+          <p>{{ evento.descripcion }}</p>
+          <div class="et-card-meta" *ngIf="evento.fechaInicio">
+            <span
+              ><i class="bi bi-calendar3"></i>
+              {{ formatFechaCorta(evento.fechaInicio) }}</span
+            >
+            <span
+              ><i class="bi bi-clock"></i>
+              {{ formatHora(evento.fechaInicio) }}</span
+            >
+            <span>—</span>
+            <span
+              >
+              {{ formatHora(evento.fechaFin) }}</span
+            >
+          </div>
+          <div class="et-card-actions">
+            <button
+              class="btn-continue"
+              (click)="seleccionarEvento(evento); $event.stopPropagation()"
+              [disabled]="evento.aforo === 0"
+              [class.completo]="evento.aforo === 0"
+            >
+              <span *ngIf="evento.aforo !== 0">
+                Reservar <i class="bi bi-arrow-right"></i>
+              </span>
+              <span *ngIf="evento.aforo === 0">
+                Sin cupos <i class="bi bi-calendar-x"></i>
+              </span>
+            </button>
+
+            <span
+              class="aforo-msg"
+              *ngIf="evento.aforo === 0 && evento.aforo !== undefined"
+            >
+              <i class="bi bi-info-circle"></i> Evento completo
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="et-empty" *ngIf="eventosFiltrados.length === 0">
+        <span>🎭</span>
+        <h3>No se encontraron eventos</h3>
+        <p>Intenta ajustar los filtros de búsqueda</p>
+        <button class="btn-continue" (click)="limpiarFiltros()">
+          Limpiar filtros
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================== PASOS 2–5 ======================== -->
+<section class="reservation-section" *ngIf="paso >= 2">
+  <div class="container">
+    <div class="stepper">
+      <div class="step" [class.active]="paso >= 1" [class.completed]="paso > 1">
+        <div class="step-number">1</div>
+        <div class="step-label">Evento</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 2" [class.completed]="paso > 2">
+        <div class="step-number">2</div>
+        <div class="step-label">Personas</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 3" [class.completed]="paso > 3">
+        <div class="step-number">3</div>
+        <div class="step-label">Mesa</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 4" [class.completed]="paso > 4">
+        <div class="step-number">4</div>
+        <div class="step-label">Resumen</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step" [class.active]="paso >= 5">
+        <div class="step-number">5</div>
+        <div class="step-label">Pago</div>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- FORMULARIO -->
+      <div class="form-card">
+        <!-- PASO 2: PERSONAS -->
+        <div *ngIf="paso === 2" class="step-content">
+          <h2 class="step-title">¿Cuántas personas asistirán?</h2>
+
+          <div class="et-event-preview" *ngIf="eventoDetalle">
+            <div class="et-preview-emoji">
+              {{ getEmojiTematica(eventoDetalle.tematica) }}
+            </div>
+            <div>
+              <span class="et-tag-tematica et-tag-inline">{{
+                eventoDetalle.tematica
+              }}</span>
+              <h4>{{ eventoDetalle.nombre }}</h4>
+              <div class="et-card-meta">
+                <span
+                  ><i class="bi bi-calendar3"></i>
+                  {{ formatFechaCorta(eventoDetalle.fechaInicio) }}</span
+                >
+                <span
+                  ><i class="bi bi-clock"></i>
+                  {{ formatHora(eventoDetalle.fechaInicio) }} hrs</span
+                >
+                <span
+                  ><i class="bi bi-people"></i> Aforo:
+                  {{ eventoDetalle.aforo }}</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="counter-wrapper">
+            <button
+              class="counter-btn"
+              (click)="decrementarPersonas()"
+              [disabled]="cantidadPersonas <= 1"
+            >
+              −
+            </button>
+            <div class="counter-display">
+              <span class="counter-value">{{ cantidadPersonas }}</span>
+              <span class="counter-label">personas</span>
+            </div>
+            <button class="counter-btn" (click)="incrementarPersonas()">
+              +
+            </button>
+          </div>
+
+          <div class="quick-select">
+            <button
+              *ngFor="let num of [1, 2, 3, 4, 5, 6, 7, 8]"
+              class="quick-btn"
+              [class.active]="cantidadPersonas === num"
+              (click)="cantidadPersonas = num; validarPersonas()"
+            >
+              {{ num }}
+            </button>
+          </div>
+
+          <div class="et-alert et-alert-error" *ngIf="mostrarAlertaAforo">
+            <i class="bi bi-x-circle-fill"></i>
+            <span
+              >Aforo máximo:
+              <strong>{{ eventoDetalle?.aforo }}</strong> personas.</span
+            >
+          </div>
+          <div
+            class="et-alert et-alert-warning"
+            *ngIf="mostrarAlertaMesa && !mostrarAlertaAforo"
+          >
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span
+              >Solo se reserva 1 mesa por reserva. Para grupos grandes, haz más
+              de una.</span
+            >
+          </div>
+          <div
+            class="et-alert et-alert-success"
+            *ngIf="
+              cantidadPersonas >= 1 && !mostrarAlertaAforo && eventoDetalle
+            "
+          >
+            <i class="bi bi-check-circle-fill"></i>
+            <span
+              >Buscaremos mesas para
+              <strong>{{ cantidadPersonas }}</strong> persona(s).</span
+            >
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-back" (click)="volverListado()">Atrás</button>
+            <button
+              class="btn-continue"
+              (click)="buscarMesas()"
+              [disabled]="
+                mostrarAlertaAforo || cantidadPersonas < 1 || cargandoMesas
+              "
+            >
+              <span *ngIf="!cargandoMesas"
+                >Buscar Mesas <i class="bi bi-arrow-right"></i
+              ></span>
+              <span *ngIf="cargandoMesas"
+                ><span class="et-spinner-sm"></span> Buscando...</span
+              >
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 3: MESAS -->
+        <div *ngIf="paso === 3" class="step-content">
+          <h2 class="step-title">Selecciona tu mesa</h2>
+          <p class="et-subtitle">
+            Mesas para <strong>{{ cantidadPersonas }}</strong> persona(s) —
+            <strong>{{ mesasDisponibles.length }}</strong> encontradas
+          </p>
+
+          <div class="et-empty" *ngIf="mesasDisponibles.length === 0">
+            <!-- Este span TIENE los efectos (solo este) -->
+            <span>🪑</span>
+
+            <h4>¡Ups! No hay mesas disponibles</h4>
+            <p>
+              Para {{ cantidadPersonas }}
+              {{ cantidadPersonas === 1 ? "persona" : "personas" }}
+            </p>
+
+            <!-- Estos spans NO tienen efectos -->
+            <div class="et-empty-suggestions">
+              <span>👥 Reduce el número de personas</span>
+              <span>📅 Prueba con otra fecha</span>
+              <span>🍽️ Elige otro evento</span>
+            </div>
+
+            <button class="btn-back" (click)="volverPersonas()">
+              <i class="bi bi-arrow-left"></i>
+              Cambiar número de personas
+            </button>
+
+            <div class="et-empty-help">
+              <i class="bi bi-info-circle"></i>
+              <span
+                >Puedes intentar con un grupo más pequeño o explorar otros
+                eventos</span
+              >
+            </div>
+          </div>
+
+          <div class="et-mesas-grid" *ngIf="mesasDisponibles.length > 0">
+            <div
+              class="et-mesa-card"
+              *ngFor="let mesa of mesasDisponibles"
+              [class.selected]="
+                mesaSeleccionada?.idEventoMesa === mesa.idEventoMesa
+              "
+              [class.ocupada]="mesaOcupadaMap[mesa.idEventoMesa]"
+              (click)="
+                !mesaOcupadaMap[mesa.idEventoMesa] && seleccionarMesa(mesa)
+              "
+            >
+              <div class="et-mesa-top">
+                <div>
+                  <span class="et-mesa-lbl">Mesa</span>
+                  <span class="et-mesa-num">{{ mesa.numeroMesa }}</span>
+                </div>
+                <span class="zona-btn">Zona {{ mesa.zona }}</span>
+                <i
+                  class="bi bi-check-circle-fill et-mesa-check"
+                  *ngIf="mesaSeleccionada?.idEventoMesa === mesa.idEventoMesa"
+                ></i>
+              </div>
+              <div class="et-mesa-seats">
+                <span
+                  *ngFor="let s of getSeats(mesa.capacidad); let i = index"
+                  class="et-seat"
+                  [class.used]="i < cantidadPersonas"
+                  >●</span
+                >
+              </div>
+              <div class="et-mesa-footer">
+                <span
+                  ><i class="bi bi-people"></i>
+                  {{ mesa.capacidad }} personas</span
+                >
+                <span
+                  class="et-status-libre"
+                  *ngIf="!mesaOcupadaMap[mesa.idEventoMesa]"
+                  >Disponible</span
+                >
+                <span
+                  class="et-status-ocupada"
+                  *ngIf="mesaOcupadaMap[mesa.idEventoMesa]"
+                  >Ocupada</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons" *ngIf="mesasDisponibles.length > 0">
+            <button class="btn-back" (click)="volverPersonas()">Atrás</button>
+            <button
+              class="btn-continue"
+              (click)="continuarAResumen()"
+              [disabled]="!mesaSeleccionada"
+            >
+              Continuar <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 4: RESUMEN -->
+        <div *ngIf="paso === 4" class="step-content">
+          <h2 class="step-title">Confirma tu reserva</h2>
+
+          <div class="et-resumen-bloque">
+            <h4 class="et-bloque-titulo">
+              <i class="bi bi-calendar-event-fill"></i> Detalles del Evento
+            </h4>
+            <div class="et-resumen-row">
+              <span>Evento</span><strong>{{ eventoDetalle?.nombre }}</strong>
+            </div>
+            <div class="et-resumen-row">
+              <span>Temática</span>
+              <span class="et-tag-tematica et-tag-inline">{{
+                eventoDetalle?.tematica
+              }}</span>
+            </div>
+            <div class="et-resumen-row">
+              <span>Descripción</span
+              ><span>{{ eventoDetalle?.descripcion }}</span>
+            </div>
+          </div>
+
+          <div class="et-resumen-bloque">
+            <h4 class="et-bloque-titulo">
+              <i class="bi bi-clock-fill"></i> Fecha y Hora
+            </h4>
+            <div class="et-resumen-row">
+              <span>Fecha</span
+              ><strong>{{
+                formatFechaLarga(eventoDetalle?.fechaInicio)
+              }}</strong>
+            </div>
+            <div class="et-resumen-row">
+              <span>Inicio</span
+              ><strong>{{ formatHora(eventoDetalle?.fechaInicio) }} hrs</strong>
+            </div>
+            <div class="et-resumen-row">
+              <span>Fin</span
+              ><span>{{ formatHora(eventoDetalle?.fechaFin) }} hrs</span>
+            </div>
+          </div>
+
+          <div class="et-resumen-bloque">
+            <h4 class="et-bloque-titulo"><i class="bi bi-table"></i> Mesa</h4>
+            <div class="et-resumen-row">
+              <span>Número</span
+              ><strong>#{{ mesaSeleccionada?.numeroMesa }}</strong>
+            </div>
+            <div class="et-resumen-row">
+              <span>Zona</span><span>{{ mesaSeleccionada?.zona }}</span>
+            </div>
+            <div class="et-resumen-row">
+              <span>Capacidad</span
+              ><span>{{ mesaSeleccionada?.capacidad }} personas máx.</span>
+            </div>
+            <div class="et-resumen-row">
+              <span>Asistentes</span
+              ><strong>{{ cantidadPersonas }} persona(s)</strong>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-back" (click)="volverMesas()">Atrás</button>
+            <button class="btn-continue" (click)="irAPago()">
+              Proceder al Pago <i class="bi bi-credit-card"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- PASO 5: PAGO -->
+        <div *ngIf="paso === 5" class="step-content">
+          <h2 class="step-title">Método de Pago</h2>
+
+          <div class="deposit-info">
+            <h3 class="deposit-title">Reserva del evento</h3>
+            <div class="deposit-detail">
+              <span>Depósito · {{ cantidadPersonas }} persona(s)</span>
+              <span class="deposit-amount">S/ 15.00</span>
+            </div>
+
+            <p class="payment-label">Métodos de pago</p>
+            <div class="payment-methods">
+              <button
+                class="payment-btn"
+                [class.active]="metodoPago === 'TARJETA'"
+                (click)="seleccionarMetodoPago('TARJETA')"
+              >
+                <span class="payment-icon">💳</span><span>Tarjeta</span>
+              </button>
+              <button
+                class="payment-btn"
+                [class.active]="metodoPago === 'YAPE'"
+                (click)="seleccionarMetodoPago('YAPE')"
+              >
+                <span class="payment-icon yape">Y</span><span>Yape</span>
+              </button>
+              <button
+                class="payment-btn"
+                [class.active]="metodoPago === 'PLIN'"
+                (click)="seleccionarMetodoPago('PLIN')"
+              >
+                <span class="payment-icon plin">P</span><span>Plin</span>
+              </button>
+            </div>
+
+            <!-- TARJETA -->
+            <div class="payment-form" *ngIf="metodoPago === 'TARJETA'">
+              <h4 class="payment-form-title">Datos de la tarjeta</h4>
+              <div class="form-group">
+                <label>Número de tarjeta</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  placeholder="1234 5678 9012 3456"
+                  [(ngModel)]="datosTarjeta.numero"
+                  (input)="formatearNumeroTarjeta($event)"
+                  maxlength="19"
+                />
+              </div>
+              <div class="form-group">
+                <label>Nombre del titular</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  placeholder="NOMBRE APELLIDO"
+                  [(ngModel)]="datosTarjeta.nombre"
+                  style="text-transform: uppercase"
+                />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Vencimiento</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    placeholder="MM/AA"
+                    [(ngModel)]="datosTarjeta.fechaExpiracion"
+                    (input)="formatearFechaExpiracion($event)"
+                    maxlength="5"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>CVV</label>
+                  <input
+                    type="password"
+                    class="form-input"
+                    placeholder="123"
+                    [(ngModel)]="datosTarjeta.cvv"
+                    maxlength="4"
+                  />
+                </div>
+              </div>
+              <div class="card-icons">
+                <span class="card-icon">💳 Visa</span>
+                <span class="card-icon">💳 Mastercard</span>
+                <span class="card-icon">💳 Amex</span>
+              </div>
+            </div>
+
+            <!-- YAPE -->
+            <div class="payment-form" *ngIf="metodoPago === 'YAPE'">
+              <div *ngIf="!imagenPreview">
+                <h4 class="payment-form-title">
+                  Escanea el código QR con Yape
+                </h4>
+                <div class="qr-container">
+                  <img [src]="qrYapeUrl" alt="QR Yape" class="qr-code" />
+                  <p class="qr-instructions">
+                    Paga <strong>S/ 15.00</strong> con Yape
+                  </p>
+                  <div class="yape-badge">
+                    <span class="yape-icon">Y</span
+                    ><span>Pago mediante Yape</span>
+                  </div>
+                </div>
+                <label
+                  for="capturaYapeEt"
+                  class="btn-upload-label btn-upload-yape"
+                >
+                  <i class="bi bi-upload"></i> Subir comprobante de Yape
+                </label>
+                <input
+                  type="file"
+                  id="capturaYapeEt"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  style="display: none"
+                />
+              </div>
+              <div *ngIf="imagenPreview && !procesandoPago">
+                <h4 class="payment-form-title">Verificar comprobante</h4>
+                <div class="captura-preview-container">
+                  <img
+                    [src]="imagenPreview"
+                    alt="Comprobante Yape"
+                    class="captura-preview"
+                  />
+                </div>
+                <div class="action-buttons" style="margin-top: 12px">
+                  <label
+                    for="capturaYapeEt2"
+                    class="btn-back"
+                    style="cursor: pointer; text-align: center"
+                  >
+                    <i class="bi bi-arrow-repeat"></i> Cambiar imagen
+                  </label>
+                  <input
+                    type="file"
+                    id="capturaYapeEt2"
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                    style="display: none"
+                  />
+                  <button
+                    class="btn-continue"
+                    (click)="confirmarPago()"
+                    [disabled]="loading"
+                  >
+                    <i class="bi bi-check-circle"></i> Validar y confirmar
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="procesandoPago" class="et-validando">
+                <div class="et-spinner"></div>
+                <p>Validando tu pago...</p>
+              </div>
+              <div
+                class="et-alert et-alert-error"
+                *ngIf="errorPago"
+                style="margin-top: 12px"
+              >
+                <i class="bi bi-x-circle-fill"></i>
+                <span>{{ errorPago }}</span>
+                <button class="et-btn-retry" (click)="intentarNuevamente()">
+                  Reintentar
+                </button>
+              </div>
+            </div>
+
+            <!-- PLIN -->
+            <div class="payment-form" *ngIf="metodoPago === 'PLIN'">
+              <div *ngIf="!imagenPreview">
+                <h4 class="payment-form-title">
+                  Escanea el código QR con Plin
+                </h4>
+                <div class="qr-container">
+                  <img [src]="qrPlinUrl" alt="QR Plin" class="qr-code" />
+                  <p class="qr-instructions">
+                    Paga <strong>S/ 15.00</strong> con Plin
+                  </p>
+                  <div class="plin-badge">
+                    <span class="plin-icon">P</span
+                    ><span>Pago mediante Plin</span>
+                  </div>
+                </div>
+                <label
+                  for="capturaPlinEt"
+                  class="btn-upload-label btn-upload-plin"
+                >
+                  <i class="bi bi-upload"></i> Subir comprobante de Plin
+                </label>
+                <input
+                  type="file"
+                  id="capturaPlinEt"
+                  accept="image/*"
+                  (change)="onFileSelected($event)"
+                  style="display: none"
+                />
+              </div>
+              <div *ngIf="imagenPreview && !procesandoPago">
+                <h4 class="payment-form-title">Verificar comprobante</h4>
+                <div class="captura-preview-container">
+                  <img
+                    [src]="imagenPreview"
+                    alt="Comprobante Plin"
+                    class="captura-preview"
+                  />
+                </div>
+                <div class="action-buttons" style="margin-top: 12px">
+                  <label
+                    for="capturaPlinEt2"
+                    class="btn-back"
+                    style="cursor: pointer; text-align: center"
+                  >
+                    <i class="bi bi-arrow-repeat"></i> Cambiar imagen
+                  </label>
+                  <input
+                    type="file"
+                    id="capturaPlinEt2"
+                    accept="image/*"
+                    (change)="onFileSelected($event)"
+                    style="display: none"
+                  />
+                  <button
+                    class="btn-continue"
+                    (click)="confirmarPago()"
+                    [disabled]="loading"
+                  >
+                    <i class="bi bi-check-circle"></i> Validar y confirmar
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="procesandoPago" class="et-validando">
+                <div class="et-spinner"></div>
+                <p>Validando tu pago...</p>
+              </div>
+              <div
+                class="et-alert et-alert-error"
+                *ngIf="errorPago"
+                style="margin-top: 12px"
+              >
+                <i class="bi bi-x-circle-fill"></i>
+                <span>{{ errorPago }}</span>
+                <button class="et-btn-retry" (click)="intentarNuevamente()">
+                  Reintentar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-back" (click)="volverResumen()">
+              <i class="bi bi-arrow-left"></i>
+              Atrás
+            </button>
+
+            <button
+              class="btn-confirm"
+              [class.procesando]="procesandoPago"
+              [disabled]="!puedeConfirmarPago() || procesandoPago"
+              (click)="confirmarPago()"
+            >
+              <ng-container *ngIf="!procesandoPago">
+                <i class="bi bi-credit-card"></i>
+                Confirmar y Pagar
+              </ng-container>
+
+              <ng-container *ngIf="procesandoPago">
+                <span class="spinner"></span>
+                Procesando pago...
+              </ng-container>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SIDEBAR -->
+      <div class="summary-card">
+        <h3 class="summary-title">Resumen</h3>
+
+        <div class="summary-item" *ngIf="eventoDetalle">
+          <span class="summary-icon">🎭</span>
+          <span class="summary-label">Evento</span>
+          <span class="summary-value">{{ eventoDetalle.nombre }}</span>
+        </div>
+        <div class="summary-item" *ngIf="eventoDetalle?.tematica">
+          <span class="summary-icon">🎨</span>
+          <span class="summary-label">Temática</span>
+          <span class="summary-value">{{ eventoDetalle?.tematica }}</span>
+        </div>
+        <div class="summary-item" *ngIf="eventoDetalle?.fechaInicio">
+          <span class="summary-icon">📅</span>
+          <span class="summary-label">Fecha</span>
+          <span class="summary-value">{{
+            formatFechaCorta(eventoDetalle?.fechaInicio)
+          }}</span>
+        </div>
+        <div class="summary-item" *ngIf="eventoDetalle?.fechaInicio">
+          <span class="summary-icon">🕐</span>
+          <span class="summary-label">Hora</span>
+          <span class="summary-value"
+            >{{ formatHora(eventoDetalle?.fechaInicio) }} hrs</span
+          >
+        </div>
+        <div class="summary-item">
+          <span class="summary-icon">👥</span>
+          <span class="summary-label">Personas</span>
+          <span class="summary-value">{{ cantidadPersonas }}</span>
+        </div>
+        <div class="summary-item" *ngIf="mesaSeleccionada">
+          <span class="summary-icon">🪑</span>
+          <span class="summary-label">Mesa</span>
+          <span class="summary-value"
+            >#{{ mesaSeleccionada.numeroMesa }} · Zona
+            {{ mesaSeleccionada.zona }}</span
+          >
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="summary-item" *ngIf="paso === 5">
+          <span class="summary-icon">💰</span>
+          <span class="summary-label">Total</span>
+          <span class="summary-value" style="font-size: 1.15rem; color: #c67c4e"
+            >S/ 15.00</span
+          >
+        </div>
+
+        <div class="restaurant-info">
+          <div class="et-rest-icon">🍜</div>
+          <div class="restaurant-details">
+            <h4 class="restaurant-name">KoroFood</h4>
+            <p class="restaurant-type">Cocina Asiática Temática</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALERTA -->
+    <div
+      class="koro-alerta"
+      [class.koro-exito]="alertaTipo === 'exito'"
+      [class.koro-error]="alertaTipo === 'error'"
+      [class.koro-mostrar]="mostrarAlerta"
+      *ngIf="mostrarAlerta"
+    >
+      <ng-container *ngIf="alertaTipo === 'exito'">
+        <div class="koro-contenido">
+          <h3>¡Reserva Confirmada!</h3>
+          <div class="koro-detalles">
+            <p><strong>Evento:</strong> {{ eventoDetalle?.nombre }}</p>
+            <p>
+              <strong>Fecha:</strong>
+              {{ formatFechaCorta(eventoDetalle?.fechaInicio) }}
+            </p>
+            <p>
+              <strong>Hora:</strong>
+              {{ formatHora(eventoDetalle?.fechaInicio) }} hrs
+            </p>
+            <p>
+              <strong>Mesa:</strong> #{{ mesaSeleccionada?.numeroMesa }} · Zona
+              {{ mesaSeleccionada?.zona }}
+            </p>
+            <p><strong>Personas:</strong> {{ cantidadPersonas }}</p>
+          </div>
+          <p class="koro-mensaje">¡Te esperamos!</p>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="alertaTipo === 'error'">
+        <div class="koro-contenido">
+          <h3>Error en la Reserva</h3>
+          <p class="koro-mensaje">{{ alertaDatos.mensaje }}</p>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>

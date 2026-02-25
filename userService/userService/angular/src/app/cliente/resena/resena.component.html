@@ -1,0 +1,292 @@
+<div class="resenas-list-page">
+  <!-- Loading User State -->
+  <div *ngIf="isLoadingUser" class="loading-full-screen">
+    <div class="spinner-border text-warning" role="status">
+      <span class="visually-hidden">Verificando usuario...</span>
+    </div>
+    <p>Verificando autenticación...</p>
+  </div>
+
+  <!-- Contenido principal (visible cuando no está cargando usuario) -->
+  <div *ngIf="!isLoadingUser">
+    <!-- Hero Section -->
+    <div class="resenas-hero">
+      <div class="hero-overlay"></div>
+      <div class="container">
+        <div class="hero-content">
+          <h1 class="hero-title">Reseñas de Nuestros Clientes</h1>
+          <p class="hero-subtitle">
+            Descubre lo que nuestros comensales piensan sobre nuestras experiencias gastronómicas
+          </p>
+          
+          <!-- Botón diferente según autenticación -->
+          <button 
+            *ngIf="isLoggedIn" 
+            class="btn-crear-resena" 
+            (click)="irACrearResena()">
+            <i class="bi bi-plus-circle-fill me-2"></i>
+            Crear Nueva Reseña
+          </button>
+          
+          <button 
+            *ngIf="!isLoggedIn" 
+            class="btn-crear-resena" 
+            (click)="redirectToLogin()">
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            Inicia Sesión para Crear Reseña
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="resenas-content">
+      <div class="container">
+        
+        <!-- Banner informativo para usuarios no autenticados -->
+        <div *ngIf="!isLoggedIn" class="guest-banner">
+          <div class="guest-banner-content">
+            <i class="bi bi-info-circle-fill"></i>
+            <div>
+              <h5>Vista de Invitado</h5>
+              <p>Estás viendo todas las reseñas públicas. 
+                <a href="javascript:void(0)" (click)="redirectToLogin()" class="link-login">
+                  Inicia sesión
+                </a> 
+                para crear tus propias reseñas.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Estadísticas y Filtros -->
+        <div class="stats-section">
+          <div class="row align-items-center">
+            <!-- Estadísticas -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+              <div class="stats-card">
+                <div class="stats-icon">
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <div class="stats-info">
+                  <h3 class="stats-number">{{ getCalificacionPromedio() | number:'1.1-1' }}</h3>
+                  <p class="stats-label">Calificación Promedio</p>
+                  <div class="stats-stars">
+                    <i *ngFor="let star of getStars(getCalificacionPromedio())" 
+                       class="bi" 
+                       [ngClass]="star === 1 ? 'bi-star-fill' : 'bi-star'">
+                    </i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Reseñas -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+              <div class="stats-card">
+                <div class="stats-icon stats-icon-secondary">
+                  <i class="bi bi-chat-heart-fill"></i>
+                </div>
+                <div class="stats-info">
+                  <h3 class="stats-number">{{ resenasFiltradas.length }}</h3>
+                  <p class="stats-label">Total de Reseñas</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filtro Mis Reseñas (solo para usuarios autenticados) -->
+            <div class="col-lg-4">
+              <div class="filter-card" *ngIf="isLoggedIn">
+                <button 
+                  class="btn-toggle-mis-resenas" 
+                  [class.active]="verSoloMias"
+                  (click)="toggleMisResenas()"
+                >
+                  <i class="bi" [ngClass]="verSoloMias ? 'bi-people-fill' : 'bi-person-fill-check'"></i>
+                  <span>{{ verSoloMias ? 'Todas las Reseñas' : 'Mis Reseñas' }}</span>
+                </button>
+              </div>
+              
+              <!-- Mensaje para invitados -->
+              <div class="filter-card" *ngIf="!isLoggedIn">
+                <div class="guest-filter-message">
+                  <i class="bi bi-eye-fill"></i>
+                  <span>Viendo todas las reseñas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filtros de Calificación -->
+        <div class="filter-section">
+          <h4 class="filter-title">Filtrar por calificación:</h4>
+          <div class="filter-buttons">
+            <button 
+              class="filter-btn" 
+              [class.active]="filtroCalificacion === null"
+              (click)="filtrarPorCalificacion(null)"
+            >
+              <i class="bi bi-star-fill"></i>
+              Todas ({{ resenas.length }})
+            </button>
+            <button 
+              *ngFor="let cal of [5, 4, 3, 2, 1]"
+              class="filter-btn" 
+              [class.active]="filtroCalificacion === cal"
+              (click)="filtrarPorCalificacion(cal)"
+            >
+              <i class="bi bi-star-fill"></i>
+              {{ cal }} Estrellas ({{ getTotalPorCalificacion(cal) }})
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-container">
+          <div class="spinner-border text-warning" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p>Cargando reseñas...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error && !isLoading" class="alert alert-warning text-center" role="alert">
+          {{ error }}
+        </div>
+
+        <!-- Reseñas Grid -->
+        <div *ngIf="!isLoading && !error" class="resenas-grid">
+          <div *ngFor="let resena of resenasPaginadas" class="resena-card">
+            <!-- Header con usuario -->
+            <div class="resena-header">
+              <img 
+                [src]="resena.imagenUsuario" 
+                [alt]="'Usuario ' + resena.idUsuario"
+                class="user-avatar"
+                (error)="onImgError($event)"
+              >
+              <div class="user-info">
+                <h5 class="user-name">{{ resena.nombreUsuarioCompleto }}</h5>
+                <div class="rating-stars">
+                  <i *ngFor="let star of getStars(resena.calificacion)" 
+                     class="bi" 
+                     [ngClass]="star === 1 ? 'bi-star-fill' : 'bi-star'">
+                  </i>
+                </div>
+              </div>
+              <!-- Badge "Mía" solo si el usuario está autenticado -->
+              <span class="badge-mia" *ngIf="esMiResena(resena)">
+                <i class="bi bi-person-fill-check"></i> Mía
+              </span>
+            </div>
+
+            <!-- Imagen de la entidad -->
+            <div class="resena-image">
+              <img 
+                [src]="resena.imagenEntidad" 
+                [alt]="'Entidad ' + resena.idEntidad"
+                (error)="onImgErrorEntidad($event)"
+              >
+            </div>
+
+            <!-- Nombre Entidad -->
+            <div class="resena-entidad">
+              <p class="resena-entidad">
+                {{ resena.nombreEntidad }}
+              </p>
+            </div>
+
+            <!-- Comentario -->
+            <div class="resena-body">
+              <p class="resena-comentario">
+                "{{ resena.comentario }}"
+              </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="resena-footer">
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && !error && resenasFiltradas.length === 0" class="empty-state">
+          <i class="bi bi-chat-left-text icon-message"></i>
+          <h3>No hay reseñas</h3>
+          <p *ngIf="verSoloMias">Aún no has creado ninguna reseña</p>
+          <p *ngIf="!verSoloMias && filtroCalificacion !== null">
+            No hay reseñas con {{ filtroCalificacion }} estrella(s)
+          </p>
+          <p *ngIf="!verSoloMias && filtroCalificacion === null && !isLoggedIn">
+            Sé el primero en dejar una reseña
+          </p>
+          
+          <button 
+            *ngIf="isLoggedIn"
+            class="btn-crear-resena-alt" 
+            (click)="irACrearResena()">
+            <i class="bi bi-plus-circle-fill me-2 icon-button"></i>
+            Crear Mi Primera Reseña
+          </button>
+          
+          <button 
+            *ngIf="!isLoggedIn"
+            class="btn-crear-resena-alt" 
+            (click)="redirectToLogin()">
+            <i class="bi bi-box-arrow-in-right me-2 icon-button"></i>
+            Iniciar Sesión para Crear Reseña
+          </button>
+        </div>
+
+        <!-- Paginación -->
+        <div class="pagination-container" *ngIf="totalPages > 1 && !isLoading">
+          <nav aria-label="Paginación de reseñas">
+            <ul class="pagination">
+              <!-- Primera página -->
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(1)" type="button">
+                  <i class="bi bi-chevron-double-left"></i>
+                </button>
+              </li>
+
+              <!-- Anterior -->
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="previousPage()" type="button">
+                  <i class="bi bi-chevron-left"></i>
+                </button>
+              </li>
+
+              <!-- Páginas -->
+              <li class="page-item" *ngFor="let page of pages" [class.active]="currentPage === page">
+                <button class="page-link" (click)="goToPage(page)" type="button">
+                  {{ page }}
+                </button>
+              </li>
+
+              <!-- Siguiente -->
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="nextPage()" type="button">
+                  <i class="bi bi-chevron-right"></i>
+                </button>
+              </li>
+
+              <!-- Última página -->
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="goToPage(totalPages)" type="button">
+                  <i class="bi bi-chevron-double-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+
+          <div class="pagination-info">
+            Mostrando {{ (currentPage - 1) * itemsPerPage + 1 }} -
+            {{ maxItem }} de {{ resenasFiltradas.length }} reseñas
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

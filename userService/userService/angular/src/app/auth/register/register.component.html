@@ -1,0 +1,283 @@
+<div class="modal-overlay" (click)="cancelar()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <img
+          *ngIf="socialData?.avatar"
+          [src]="socialData.avatar"
+          alt="Avatar"
+          class="user-avatar"
+        />
+        <div>
+          <h2 class="modal-title">Completa tu Registro</h2>
+          <p class="modal-subtitle">
+            Hola <strong>{{ socialData?.nombre }}</strong
+            >, necesitamos algunos datos adicionales
+          </p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="close-button"
+        (click)="cancelar()"
+        aria-label="Cerrar"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <form [formGroup]="socialRegisterForm" (ngSubmit)="onSubmit()">
+        <!-- Información del proveedor -->
+        <div class="info-box">
+          <p class="info-text">
+            <span class="provider-badge">{{ socialData?.provider }}</span>
+            Te has autenticado con {{ socialData?.provider }}. Para completar tu
+            registro, necesitamos la siguiente información.
+          </p>
+        </div>
+
+        <!-- Campos del formulario -->
+        <div class="form-grid">
+          <!-- Apellido Paterno -->
+          <div class="form-group">
+            <label for="apePaterno" class="form-label">
+              Apellido Paterno <span class="required">*</span>
+            </label>
+            <input
+              id="apePaterno"
+              type="text"
+              formControlName="apePaterno"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('apePaterno')"
+              placeholder="Ingresa tu apellido paterno"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('apePaterno')">
+              {{ getErrorMessage("apePaterno") }}
+            </div>
+          </div>
+
+          <!-- Apellido Materno -->
+          <div class="form-group">
+            <label for="apeMaterno" class="form-label">
+              Apellido Materno <span class="required">*</span>
+            </label>
+            <input
+              id="apeMaterno"
+              type="text"
+              formControlName="apeMaterno"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('apeMaterno')"
+              placeholder="Ingresa tu apellido materno"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('apeMaterno')">
+              {{ getErrorMessage("apeMaterno") }}
+            </div>
+          </div>
+
+          <!-- Tipo de Documento -->
+          <div class="form-group">
+            <label for="tipoDoc" class="form-label">
+              Tipo de Documento <span class="required">*</span>
+            </label>
+            <select
+              id="tipoDoc"
+              formControlName="tipoDoc"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('tipoDoc')"
+            >
+              <option value="" disabled>Selecciona un tipo</option>
+              <option *ngFor="let tipo of tiposDocumento" [value]="tipo">
+                {{ tipo }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="isFieldInvalid('tipoDoc')">
+              {{ getErrorMessage("tipoDoc") }}
+            </div>
+          </div>
+
+          <!-- Número de Documento -->
+          <div class="form-group">
+            <label for="nroDoc" class="form-label">
+              Número de Documento <span class="required">*</span>
+            </label>
+            <input
+              id="nroDoc"
+              type="text"
+              formControlName="nroDoc"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('nroDoc')"
+              placeholder="12345678"
+              maxlength="8"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('nroDoc')">
+              {{ getErrorMessage("nroDoc") }}
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="form-group">
+            <label for="telefono" class="form-label">
+              Teléfono <span class="required">*</span>
+            </label>
+            <input
+              id="telefono"
+              type="text"
+              formControlName="telefono"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('telefono')"
+              placeholder="987654321"
+              maxlength="9"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('telefono')">
+              {{ getErrorMessage("telefono") }}
+            </div>
+          </div>
+
+          <!-- Distrito -->
+          <div class="form-group">
+            <label for="idDistrito" class="form-label">
+              Distrito <span class="required">*</span>
+            </label>
+            <select
+              id="idDistrito"
+              formControlName="idDistrito"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('idDistrito')"
+            >
+              <option value="" disabled>Selecciona tu distrito</option>
+              <option
+                *ngFor="let distrito of distritos"
+                [value]="distrito.idDistrito"
+              >
+                {{ distrito.nombre }}
+              </option>
+            </select>
+            <div class="error-message" *ngIf="isFieldInvalid('idDistrito')">
+              {{ getErrorMessage("idDistrito") }}
+            </div>
+          </div>
+
+          <!-- Dirección (ocupa 2 columnas) -->
+          <div class="form-group full-width">
+            <label for="direccion" class="form-label">
+              Dirección <span class="required">*</span>
+            </label>
+            <input
+              id="direccion"
+              type="text"
+              formControlName="direccion"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('direccion')"
+              placeholder="Av. Ejemplo 123, San Isidro"
+            />
+            <div class="error-message" *ngIf="isFieldInvalid('direccion')">
+              {{ getErrorMessage("direccion") }}
+            </div>
+          </div>
+
+          <!-- Contraseña (ocupa 2 columnas) -->
+          <div class="form-group full-width">
+            <label for="clave" class="form-label">
+              Contraseña <span class="required">*</span>
+            </label>
+            <div class="password-input-wrapper">
+              <input
+                id="clave"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="clave"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('clave')"
+                placeholder="Mínimo 6 caracteres"
+              />
+              <button
+                type="button"
+                class="toggle-password"
+                (click)="togglePassword()"
+              >
+                <svg
+                  *ngIf="showPassword"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 4C4.5 4 2 10 2 10s2.5 6 8 6 8-6 8-6-2.5-6-8-6z"
+                    stroke="#999"
+                    stroke-width="1.5"
+                    fill="none"
+                  />
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r="3"
+                    stroke="#999"
+                    stroke-width="1.5"
+                    fill="none"
+                  />
+                  <line
+                    x1="3"
+                    y1="3"
+                    x2="17"
+                    y2="17"
+                    stroke="#999"
+                    stroke-width="1.5"
+                  />
+                </svg>
+
+                <svg
+                  *ngIf="!showPassword"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 4C4.5 4 2 10 2 10s2.5 6 8 6 8-6 8-6-2.5-6-8-6z"
+                    stroke="#999"
+                    stroke-width="1.5"
+                    fill="none"
+                  />
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r="3"
+                    stroke="#999"
+                    stroke-width="1.5"
+                    fill="none"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('clave')">
+              {{ getErrorMessage("clave") }}
+            </div>
+            <small class="form-hint">
+              Esta contraseña te permitirá acceder sin usar
+              {{ socialData?.provider }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Footer con botones -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cancelar()">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="socialRegisterForm.invalid"
+          >
+            Completar Registro
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

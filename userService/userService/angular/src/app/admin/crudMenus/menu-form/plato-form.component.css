@@ -1,0 +1,82 @@
+/* crudMenus/plato-form/plato-form.component.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap');
+
+.container-fluid {
+  font-family: 'Inter', 'Roboto', sans-serif;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background-color: #2C2C2C;
+  color: white;
+  border-radius: 12px 12px 0 0;
+  padding: 1.5rem;
+}
+
+.card-header h4 {
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #2C2C2C;
+  margin-bottom: 0.5rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+}
+
+.form-control,
+.form-select {
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-family: 'Roboto', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #C67C4E;
+  box-shadow: 0 0 0 0.2rem rgba(198, 124, 78, 0.15);
+}
+
+.btn {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #C67C4E;
+  border-color: #C67C4E;
+}
+
+.btn-primary:hover {
+  background-color: #A66439;
+  border-color: #A66439;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(198, 124, 78, 0.3);
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.alert {
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+}

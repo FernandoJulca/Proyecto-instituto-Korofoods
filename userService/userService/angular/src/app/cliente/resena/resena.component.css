@@ -1,0 +1,682 @@
+/* ==================== PAGE LAYOUT ==================== */
+.resenas-list-page {
+  min-height: 100vh;
+  background-color: #FAF9F6;
+}
+
+/* ==================== HERO SECTION ==================== */
+.resenas-hero {
+  position: relative;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 7rem 0;
+  overflow: hidden;
+}
+
+.resenas-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/img/banner3.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.3;
+}
+
+.hero-content {
+  position: relative;
+  text-align: center;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.95);
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-crear-resena {
+  background: white;
+  color: #E67E22;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-crear-resena:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== CONTENT ==================== */
+.resenas-content {
+  padding: 3rem 0;
+  margin-top: -2rem;
+  position: relative;
+  z-index: 3;
+}
+
+/* ==================== ESTADÍSTICAS ==================== */
+.stats-section {
+  margin-bottom: 3rem;
+}
+
+.stats-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.stats-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stats-icon-secondary {
+  background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%);
+}
+
+.stats-icon i {
+  font-size: 2rem;
+  color: white;
+}
+
+.stats-info {
+  flex: 1;
+}
+
+.stats-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #3E2723;
+  margin-bottom: 0.25rem;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.stats-label {
+  font-size: 0.95rem;
+  color: #6B6B6B;
+  margin-bottom: 0.5rem;
+}
+
+.stats-stars {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.stats-stars i {
+  color: #FFB800;
+  font-size: 1.1rem;
+}
+
+.stats-stars .bi-star {
+  color: #E0E0E0;
+}
+
+/* ==================== FILTRO MIS RESEÑAS ==================== */
+.filter-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-toggle-mis-resenas {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: #F5F5F5;
+  border: 2px solid #E0E0E0;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #6B6B6B;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.btn-toggle-mis-resenas i {
+  font-size: 1.5rem;
+}
+
+.btn-toggle-mis-resenas:hover {
+  border-color: #E67E22;
+  color: #E67E22;
+  transform: translateY(-2px);
+}
+
+.btn-toggle-mis-resenas.active {
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  color: white;
+  border-color: #E67E22;
+}
+
+/* ==================== FILTROS DE CALIFICACIÓN ==================== */
+.filter-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 3rem;
+}
+
+.filter-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #3E2723;
+  margin-bottom: 1rem;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.filter-btn {
+  padding: 0.7rem 1.5rem;
+  background: #F5F5F5;
+  border: 2px solid #E0E0E0;
+  border-radius: 25px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #6B6B6B;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-btn i {
+  color: #FFB800;
+}
+
+.filter-btn:hover {
+  border-color: #E67E22;
+  color: #E67E22;
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  color: white;
+  border-color: #E67E22;
+}
+
+.filter-btn.active i {
+  color: white;
+}
+
+/* ==================== RESEÑAS GRID ==================== */
+.resenas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.resena-card {
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.resena-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+.resena-header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #F0F0F0;
+  position: relative;
+}
+
+.user-avatar {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #E67E22;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #3E2723;
+  margin-bottom: 0.3rem;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.rating-stars i {
+  color: #FFB800;
+  font-size: 1rem;
+}
+
+.rating-stars .bi-star {
+  color: #E0E0E0;
+}
+
+.badge-mia {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Imagen */
+.resena-image {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.resena-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.resena-card:hover .resena-image img {
+  transform: scale(1.05);
+}
+
+/* Entidad Nombre */
+.resena-entidad {
+  padding: .4rem 1rem;
+}
+
+.resena-entidad {
+  font-size: 1.1rem;
+  color: #4A4A4A;
+  line-height: 1.6;
+  font-weight: bold;
+  font-style: italic;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Body */
+.resena-body {
+  padding: .4rem 1rem;
+}
+
+.resena-comentario {
+  font-size: 1rem;
+  color: #4A4A4A;
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Footer */
+.resena-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #F0F0F0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resena-id {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* ==================== LOADING ==================== */
+.loading-container {
+  text-align: center;
+  padding: 5rem 0;
+}
+
+.loading-container .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: #E67E22;
+}
+
+.loading-container p {
+  margin-top: 1rem;
+  color: #6B6B6B;
+  font-size: 1.1rem;
+}
+
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state i {
+  color: #E0E0E0;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state .icon-message {
+  font-size: 5rem;
+}
+
+.empty-state .icon-button {
+  font-size: 1rem;
+}
+
+.empty-state h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #3E2723;
+  margin-bottom: 0.75rem;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  color: #6B6B6B;
+  margin-bottom: 2rem;
+}
+
+.btn-crear-resena-alt {
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-crear-resena-alt:hover {
+  background: linear-gradient(135deg, #D35400 0%, #C44D00 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+}
+
+/* ==================== PAGINACIÓN ==================== */
+.pagination-container {
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.page-item {
+  display: inline-block;
+}
+
+.page-link {
+  padding: 0.6rem 1rem;
+  min-width: 45px;
+  height: 45px;
+  border: 2px solid #E0E0E0;
+  background: white;
+  color: #6B6B6B;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-link:hover:not(:disabled) {
+  border-color: #E67E22;
+  color: #E67E22;
+  transform: translateY(-2px);
+}
+
+.page-item.active .page-link {
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  color: white;
+  border-color: #E67E22;
+}
+
+.page-item.disabled .page-link {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pagination-info {
+  font-size: 0.95rem;
+  color: #6B6B6B;
+  text-align: center;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 991px) {
+  .resenas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .filter-buttons {
+    flex-direction: column;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .resenas-hero {
+    padding: 3rem 0 2rem;
+  }
+
+  .stats-card {
+    padding: 1.5rem;
+  }
+
+  .stats-number {
+    font-size: 2rem;
+  }
+
+  .resenas-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .btn-crear-resena {
+    padding: 0.85rem 2rem;
+    font-size: 1rem;
+  }
+
+  .stats-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .stats-icon i {
+    font-size: 1.75rem;
+  }
+
+  .pagination {
+    gap: 0.3rem;
+  }
+
+  .page-link {
+    min-width: 40px;
+    height: 40px;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Loading Full Screen */
+.loading-full-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+}
+
+/* Guest Banner */
+.guest-banner {
+  background: linear-gradient(135deg, #E67E22 0%, #D35400 100%);
+  border-radius: 12px;
+  padding: 20px 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.guest-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: white;
+}
+
+.guest-banner-content i {
+  font-size: 40px;
+  opacity: 0.9;
+}
+
+.guest-banner-content h5 {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.guest-banner-content p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.link-login {
+  color: white;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+}
+
+.link-login:hover {
+  opacity: 0.8;
+  color: white;
+}
+
+/* Guest Filter Message */
+.guest-filter-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+.guest-filter-message i {
+  font-size: 24px;
+}
+
+.guest-filter-message span {
+  font-size: 20px;
+}
+
+.btn-crear-resena:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.btn-crear-resena i {
+  font-size: 18px;
+}
